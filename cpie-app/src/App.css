@@ -1,5 +1,9 @@
 .App {
   text-align: center;
+  /* display: flex; */
+  /* flex-wrap: wrap; */
+  /* margin-bottom: 10px; */
+  height: 100%
 }
 
 .App-logo {
@@ -39,9 +43,9 @@
 
 
 /* On mouse hover, lighten state color */
-path:hover {
+/* path:hover {
 	fill-opacity: .7;
-}
+} */
 
 /* Style for Custom Tooltip */
 div.tooltip {   
@@ -67,4 +71,29 @@ body {
 	position:absolute;
 	left:800px;
 	top:350px;
+}
+/* 
+.wrapper {
+ 
+} */
+
+.column{
+  width: 50%;
+  height: 100%;
+  float: left
+}
+
+.left,
+.right {
+  flex: 1 0 50%;
+  /* background: lightgreen; */
+  white-space: nowrap;
+  /* text-align: center; */
+  /* padding: 10px; */
+  /* box-sizing: border-box; */
+}
+
+
+.slider text {
+  font-size: 8px;
 }
