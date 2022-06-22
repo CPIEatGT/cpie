@@ -7,52 +7,52 @@ import classnames from "classnames";
 
 import MapView from "./visualizer/MapView";
 import StackLine from "./visualizer/StackLine";
-import DotMapView from "./visualizer/DotMapView";
+import DotMapViewCombine from "./visualizer/DotMapViewCombine";
 
 @observer
 class App extends React.Component {
 
   constructor(props) {
 
-    
+
     super(props);
-    // this.state = {
-    //   year: 1999,
-    //   statecode:'Alabama'
-    // }
-  
+    this.state = {
+      // year: 1999,
+      // statecode:'Alabama'
+      FACID: 3
+    }
+
   }
 
   @observable year = '1999'
   @observable statecode = 'Alabama'
- 
-  
+  // @observable FACID = 3
 
 
-  setyear(year){
-    console.log(year)
-    this.year = year
-    
-  
-}
 
-setstatecode(statecode){
-  console.log(statecode)
-  
-  this.statecode =statecode
 
-}
+  setFACID(FACID) {
+    console.log(FACID)
+
+    this.setState({
+      FACID: parseInt(FACID)
+    })
+
+
+
+  }
+
+  setstatecode(statecode) {
+    console.log(statecode)
+
+    this.statecode = statecode
+
+  }
 
   render() {
     return (
       <div className="App">
-        <div class="column" >
-        <MapView year = {this.year} statecode = {this.statecode} setyear={year => this.setyear(year)} setstatecode={statecode => this.setstatecode(statecode)}/>
-        <StackLine statecode = {this.statecode} setyear={year => this.setyear(year)} />
-        </div>
-        <div class="column"  >
-        <DotMapView year = {this.year} statecode = {this.statecode} setyear={year => this.setyear(year)} setstatecode={statecode => this.setstatecode(statecode)}/>
-        </div>
+         <DotMapViewCombine year = {this.year} statecode = {this.statecode} setFACID={FACID => this.setFACID(FACID)} setstatecode={statecode => this.setstatecode(statecode)}/>
       </div>
     )
   }

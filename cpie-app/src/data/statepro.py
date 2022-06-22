@@ -3,27 +3,27 @@ import pandas as pd
 
 # stated = {"AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California","CO":"Colorado","CT":"Connecticut","DE":"Delaware","FL":"Florida","GA":"Georgia","HI":"Hawaii","ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa","KS":"Kansas","KY":"Kentucky","LA":"Louisiana","ME":"Maine","MD":"Maryland","MA":"Massachusetts","MI":"Michigan","MN":"Minnesota","MS":"Mississippi","MO":"Missouri","MT":"Montana","NE":"Nebraska","NV":"Nevada","NH":"New Hampshire","NJ":"New Jersey","NM":"New Mexico","NY":"New York","NC":"North Carolina","ND":"North Dakota","OH":"Ohio","OK":"Oklahoma","OR":"Oregon","PA":"Pennsylvania","RI":"Rhode Island","SC":"South Carolina","SD":"South Dakota","TN":"Tennessee","TX":"Texas","UT":"Utah","VT":"Vermont","VA":"Virginia","WA":"Washington","WV":"West Virginia","WI":"Wisconsin","WY":"Wyoming"}
 
-statename =     ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Palau','Pennsylvania','Puerto Rico','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virgin Island','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
-dict = []
-for i in statename: 
-    dict.append({
-        'value': i, 'label': i
-    })
-print(dict)
+# statename =     ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Palau','Pennsylvania','Puerto Rico','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virgin Island','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
+# dict = []
+# for i in statename: 
+#     dict.append({
+#         'value': i, 'label': i
+#     })
+# print(dict)
 
 # group sum 
-# df = pd.read_csv(r'./cpie-app/src/data/pm25_facility_state.csv')
+df = pd.read_csv(r'./cpie-app/src/data/facility_operating_scrubbers_startyear.csv')
 
-# df.groupby(['FacID','state_zip' ])[ 'deaths_coef_2'].sum().to_csv('./cpie-app/src/data/facility_to_state_sum.csv') 
+df.groupby(['FacID','year_shut' ]).count().to_csv('./cpie-app/src/data/facility_shut_count.csv') 
 
-# df1 = df.groupby(['FacID','state_zip' ]).agg({'Facility.Latitude':'first', 'Facility.Longitude':'first',
+# df1 = df.groupby(['FacID','state_zip' ]).agg({'Facility.Latitude':'first', 'Facility.Longitude':'first', 'state_facility':'first',
 #          'deaths_coef_2':'sum',
 #          }).to_csv('./cpie-app/src/data/facility_to_state_sum.csv')
 
 # df2 = df.groupby(['FacID'])[ 'deaths_coef_2'].sum().reset_index().rename(columns={'deaths_coef_2':'deaths_coef_2_all'})
 # df1 = pd.read_csv(r'./cpie-app/src/data/facility_to_state_sum.csv')
 
-# # pd.merge(df1, df2, on="FacID").to_csv('./cpie-app/src/data/facility_to_state_sum_all.csv')
+# pd.merge(df1, df2, on="FacID").to_csv('./cpie-app/src/data/facility_to_state_sum_all.csv')
 
 # df.groupby(['year','FacID' ]).agg({'deaths_coef_1':'sum', 'deaths_coef_2':'sum',
 #          'deaths_coef_3':'sum',
@@ -33,7 +33,7 @@ print(dict)
 
 # convert abb to full state name 
 # making data frame from the csv file 
-# dataframe = pd.read_csv("./cpie-app/src/data/facility_to_state_sum_all.csv") 
+# dataframe = pd.read_csv("./cpie-app/src/data/facility_to_state_year_sum2.csv") 
     
 # # using the replace() method
 # for i in stated.keys():
