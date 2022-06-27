@@ -21,6 +21,8 @@ import stateselectdata from "../data/state_to_state_sum_all_fullname.csv";
 import stackdata from "../data/facility_to_state_year_sum2_fullname.csv";
 import facility_shut from "../data/facility_shut_count.csv"
 import facility_scrub from "../data/facility_scrubbed_count.csv"
+import statestack from "../data/pm25_facility_state_sum_fullname.csv"
+
 
 
 @observer
@@ -83,7 +85,9 @@ class DotMapViewCombine extends React.Component {
     this.statecode = selectedOption.value
     // this.deathGeoJson()
     this.stateSelect()
-    this.prepMark()
+    this.stackLine({data:[]})
+    this.checkbox.current.checked = true 
+
 
   };
 
@@ -134,11 +138,18 @@ class DotMapViewCombine extends React.Component {
 
 
     if (event.target.checked) {
-      this.lineoption.yAxis[0] = {
-        type: 'value',
-        max: 1800
+      if(this.FACID){
+        this.lineoption.yAxis[0] = {
+          type: 'value',
+          max: 2000
+        }
+      }else if (this.statecode){
+        this.lineoption.yAxis[0] = {
+          type: 'value',
+          max: 6000
+        }
       }
-
+      
       this.myChart.setOption(this.lineoption);
     } else {
       this.lineoption.yAxis[0] = {
@@ -155,24 +166,28 @@ class DotMapViewCombine extends React.Component {
   }
 
 
-  prepMark(){
+  prepMark() {
     d3.csv(facility_shut).then((shutdata) => {
 
       var shutfilteredData = shutdata.filter((d) => {
 
-        if ((d["FacID"] == this.FACID)) {
+        if ((d["FacID"] == this.FACID && d.year_shut >=1999 && d.year_shut <=2020)) {
           return d;
         }
 
       })
       var marklist = []
       shutfilteredData.forEach((sd) => {
-        var text = sd.uID.toString() + " shut down"
+        // if (sd.year_shut > 2020 || sd.year_shut <1999) continue;
+
+        var text = sd.uID.toString() + " unit retired"
+        
         marklist.push(
           {
             coord: [parseInt(sd.year_shut).toString(), 0],
             label: {
               show: true,
+              fontSize: 10,
               color: "rgba(217, 41, 41, 1)",
               rotate: -90,
               offset: [25, 5],
@@ -188,254 +203,474 @@ class DotMapViewCombine extends React.Component {
 
         var scrubfilteredData = scrubdata.filter((d) => {
 
-          if ((d["FacID"] == this.FACID)) {
+          if ((d["FacID"] == this.FACID && d.year_scrubbed >=1999 && d.year_scrubbed <=2020)) {
             return d;
           }
 
         })
-        
+
         scrubfilteredData.forEach((sd) => {
-          var text = sd.uID.toString() + " scrubbed"
+          var text =  "Scrubber installed\non " + sd.uID.toString() + " unit"
           marklist.push(
             {
               coord: [parseInt(sd.year_scrubbed).toString(), 0],
               label: {
                 show: true,
+                fontSize: 10,
                 color: "rgba(37, 213, 40, 1)",
                 rotate: -90,
-                offset: [23, -5],
-                formatter:  text
+                offset: [38, -5],
+                formatter: text
               }
 
             }
           )
         })
 
-        var markDict =  {
+        var markDict = {
           symbolSize: 40,
-        //   symbol:'circle',
-        //  symbolOffset:[-10,20],
-        itemStyle: {
-          color: "#fef0d9"
-        },
-        symbolRotate:180,
-        symbolOffset:[0,20],
+          //   symbol:'circle',
+          //  symbolOffset:[-10,20],
+          itemStyle: {
+            color: "#fef0d9"
+          },
+          symbolRotate: 180,
+          symbolOffset: [0, 20],
           data: marklist
         }
-  
-  
+        console.log(markDict)
+
+
         this.stackLine(markDict)
 
       })
 
-      
+
     })
   }
 
   stackLine(markDict) {
+    console.log(markDict)
+
+    if(this.FACID){
+      d3.csv(stackdata).then((data) => {
 
 
 
-    d3.csv(stackdata).then((data) => {
 
-
-
-
-      //filter data
-      var filteredData = data.filter((d) => {
-
-        if ((d["FacID"] == this.FACID)) {
-          return d;
-        }
-
-      })
-
-     
-
-      const minco = parseFloat(d3.min(filteredData, d => parseFloat(d.deaths_coef_2))) - 0.1
-      const maxco = parseFloat(d3.max(filteredData, d => parseFloat(d.deaths_coef_2))) + 0.1
-
-      this.color.domain([minco, maxco]); // setting the range of the input data 
-
-      // extract series data:
-      const statenames = filteredData.map(d => {
-        return d.state_zip
-      })
-
-      function onlyUnique(value, index, self) {
-        return self.indexOf(value) === index;
-      }
-
-      const unistate = statenames.filter(onlyUnique)
-
-      var seriesdata = []
-
-      unistate.forEach((state) => {
-        var stateto = filteredData.filter((d) => {
-
-          if ((d["state_zip"] == state)) {
+        //filter data
+        var filteredData = data.filter((d) => {
+  
+          if ((d["FacID"] == this.FACID)) {
             return d;
           }
-
+  
         })
-
-        stateto.sort(function (first, second) {
-          return parseInt(first.year) - parseInt(second.year);
+  
+  
+  
+        const minco = parseFloat(d3.min(filteredData, d => parseFloat(d.deaths_coef_2))) - 0.1
+        const maxco = parseFloat(d3.max(filteredData, d => parseFloat(d.deaths_coef_2))) + 0.1
+  
+        this.color.domain([0, maxco]); // setting the range of the input data 
+  
+        // extract series data:
+        const statenames = filteredData.map(d => {
+          return d.state_zip
+        })
+  
+        function onlyUnique(value, index, self) {
+          return self.indexOf(value) === index;
+        }
+  
+        const unistate = statenames.filter(onlyUnique)
+  
+        var seriesdata = []
+  
+        unistate.forEach((state) => {
+          var stateto = filteredData.filter((d) => {
+  
+            if ((d["state_zip"] == state)) {
+              return d;
+            }
+  
+          })
+  
+          stateto.sort(function (first, second) {
+            return parseInt(first.year) - parseInt(second.year);
+          });
+  
+          var yearstateto = stateto.map((d) => {
+            return parseFloat(d.deaths_coef_2)
+          })
+  
+          seriesdata.push({
+  
+            name: state,
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+            
+            itemStyle: {
+              color: this.color(parseFloat(yearstateto[0]))  //change later
+            },
+            data: yearstateto,
+            sum: d3.sum(yearstateto)
+  
+  
+          })
+  
+  
+  
+  
+        })
+        // console.log(seriesdata)
+        seriesdata.sort(function (first, second) {
+          return parseFloat(second.sum) - parseFloat(first.sum);
         });
-
-        var yearstateto = stateto.map((d) => {
-          return parseFloat(d.deaths_coef_2)
+  
+        var legenddata = seriesdata.map((d) => {
+          return d.name
         })
-
-        seriesdata.push({
-
-          name: state,
-          type: 'line',
-          stack: 'Total',
-          areaStyle: {},
-          emphasis: {
-            focus: 'series'
+  
+        if (seriesdata.length > 0) {
+          seriesdata[0].markPoint = markDict
+        }
+  
+  
+  
+        this.lineoption = {
+  
+          // tooltip: {
+          //   trigger: 'axis',
+          //   // textStyle:{fontSize : 5},
+          //   // formatter: (params)=>{
+          //   //   return params.sum
+          //   // },
+          //   padding: 2,
+          //   position: [10, 10],
+          //   axisPointer: {
+          //     type: 'none',
+          //     label: {
+          //       backgroundColor: '#6a7985'
+          //     }
+          //   }
+          // },
+          // title: {
+          //   text: 'Statewide deaths associated\nwith emissions from No.' + this.FACID + ' facility',
+          //   left: 'left'
+          // },
+          legend: {
+            orient: 'vertical',
+            left: 'right',
+            type: 'scroll',//does not work
+            height: 366,
+            formatter: name => {
+              var series = this.myChart.getOption().series;
+              var value = series.filter(row => row.name === name)[0].sum
+              if(value >10){
+                return name + '    ' + Math.ceil(value / 10) * 10;
+              }else{
+                return name + '    <10' ;
+              }
+              
+            },
+            data: legenddata
           },
-          itemStyle: {
-            color: this.color(parseFloat(yearstateto[0]))  //change later
+  
+          // tooltip: {
+          //   trigger: 'axis',
+          //   axisPointer: {
+  
+          //     label: {
+          //       backgroundColor: '#6a7985'
+          //     }
+          //   }
+          // },
+          // legend: {
+          //   data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+          // },
+  
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '30%',
+            containLabel: true
           },
-          data: yearstateto,
-          sum: d3.sum(yearstateto)
-
-
-        })
-
-
-
-
-      })
-      // console.log(seriesdata)
-      seriesdata.sort(function (first, second) {
-        return parseFloat(second.sum) - parseFloat(first.sum);
+          xAxis: [
+            {
+              type: 'category',
+              // axisLabel:{interval:0,
+              //   // fontSize: 
+              // }  ,
+              // axisPointer: {
+              //   value: this.props.year,
+              //   snap: true,
+              //   lineStyle: {
+              //     color: 'rgb(100,100,100)',
+              //     width: 3
+              //   },
+              //   label: {
+              //     show: false,
+              //     formatter: (params) => {
+              //       console.log(params.value)
+              //       if (params.value !== this.year) {
+              //         // ...
+              //         this.year = params.value
+              //         // this.props.setyear(params.value)
+              //         //...
+              //       }
+              //       return null;
+              //     }
+  
+              //   },
+              //   handle: {
+              //     show: false,
+              //     color: 'rgb(100,100,100)',
+              //     size: 20,
+              //   }
+              // },
+              boundaryGap: false,
+              data: d3.range(1999, 2021, 1)
+            }
+          ],
+          yAxis: [
+            {
+              type: 'value',
+              max: 2000
+            }
+          ],
+          series: seriesdata
+  
+        };
+  
+  
+        // var chartDom = document.getElementById('linestack');
+        // var myChart = echarts.init(chartDom);
+        // myChart.setOption(this.lineoption);
+  
+        // var chartDom = document.getElementById('linestack2');
+  
+        this.myChart.setOption(this.lineoption, {
+          notMerge: true
+         
       });
-
-      var legenddata = seriesdata.map((d) => {
-        return d.name
+  
+      this.ltitle.innerText = 'No.' + this.FACID.toString() + ' facility'
       })
+      
+      
+    }else if(this.statecode){
+      d3.csv(statestack).then((data) => {
 
-      if(seriesdata.length >0){
-        seriesdata[0].markPoint = markDict
-      }
 
 
 
-      this.lineoption = {
-
-        // tooltip: {
-        //   trigger: 'axis',
-        //   // textStyle:{fontSize : 5},
-        //   // formatter: (params)=>{
-        //   //   return params.sum
-        //   // },
-        //   padding: 2,
-        //   position: [10, 10],
-        //   axisPointer: {
-        //     type: 'none',
-        //     label: {
-        //       backgroundColor: '#6a7985'
-        //     }
-        //   }
-        // },
-        title:{
-          text: 'State death caused by facility No.' + this.FACID.toString(), 
-          left:'center'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          type: 'scroll',//does not work
-          height: 366,
-          formatter: name => {
-            var series = this.myChart.getOption().series;
-            var value = series.filter(row => row.name === name)[0].sum
-            return name + '    ' + (Math.round(value * 100) / 100).toFixed(2);
+        //filter data
+        var filteredData = data.filter((d) => {
+  
+          if ((d["state_facility"] == this.statecode)) {
+            return d;
+          }
+  
+        })
+  
+  
+  
+        const minco = parseFloat(d3.min(filteredData, d => parseFloat(d.deaths_coef_2))) - 0.1
+        const maxco = parseFloat(d3.max(filteredData, d => parseFloat(d.deaths_coef_2))) + 0.1
+  
+        this.color.domain([0, maxco]); // setting the range of the input data 
+  
+        // extract series data:
+        const statenames = filteredData.map(d => {
+          return d.state_zip
+        })
+  
+        function onlyUnique(value, index, self) {
+          return self.indexOf(value) === index;
+        }
+  
+        const unistate = statenames.filter(onlyUnique)
+  
+        var seriesdata = []
+  
+        unistate.forEach((state) => {
+          var stateto = filteredData.filter((d) => {
+  
+            if ((d["state_zip"] == state)) {
+              return d;
+            }
+  
+          })
+  
+          stateto.sort(function (first, second) {
+            return parseInt(first.year) - parseInt(second.year);
+          });
+  
+          var yearstateto = stateto.map((d) => {
+            return parseFloat(d.deaths_coef_2)
+          })
+  
+          seriesdata.push({
+  
+            name: state,
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {},
+           
+            itemStyle: {
+              color: this.color(parseFloat(yearstateto[0]))  //change later
+            },
+            data: yearstateto,
+            sum: d3.sum(yearstateto)
+  
+  
+          })
+  
+  
+  
+  
+        })
+        // console.log(seriesdata)
+        seriesdata.sort(function (first, second) {
+          return parseFloat(second.sum) - parseFloat(first.sum);
+        });
+  
+        var legenddata = seriesdata.map((d) => {
+          return d.name
+        })
+  
+        if (seriesdata.length > 0) {
+          seriesdata[0].markPoint = markDict
+        }
+  
+  
+  
+        this.lineoption = {
+  
+          // tooltip: {
+          //   trigger: 'axis',
+          //   // textStyle:{fontSize : 5},
+          //   // formatter: (params)=>{
+          //   //   return params.sum
+          //   // },
+          //   padding: 2,
+          //   position: [10, 10],
+          //   axisPointer: {
+          //     type: 'none',
+          //     label: {
+          //       backgroundColor: '#6a7985'
+          //     }
+          //   }
+          // },
+          // title: {
+          //   text: 'Statewide deaths associated with emissions from ' + this.statecode,
+          //   left: 'left'
+          // },
+          legend: {
+            orient: 'vertical',
+            left: 'right',
+            type: 'scroll',//does not work
+            height: 366,
+            formatter: name => {
+              var series = this.myChart.getOption().series;
+              var value = series.filter(row => row.name === name)[0].sum
+              if(value >10){
+                return name + '    ' + Math.ceil(value / 10) * 10;
+              }else{
+                return name + '    <10' ;
+              }
+            },
+            data: legenddata
           },
-          data: legenddata
-        },
+  
+          // tooltip: {
+          //   trigger: 'axis',
+          //   axisPointer: {
+  
+          //     label: {
+          //       backgroundColor: '#6a7985'
+          //     }
+          //   }
+          // },
+          // legend: {
+          //   data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+          // },
+  
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '15%',
+            containLabel: true
+          },
+          xAxis: [
+            {
+              type: 'category',
+              // axisLabel:{interval:0,
+              //   // fontSize: 
+              // }  ,
+              // axisPointer: {
+              //   value: this.props.year,
+              //   snap: true,
+              //   lineStyle: {
+              //     color: 'rgb(100,100,100)',
+              //     width: 3
+              //   },
+              //   label: {
+              //     show: false,
+              //     formatter: (params) => {
+              //       console.log(params.value)
+              //       if (params.value !== this.year) {
+              //         // ...
+              //         this.year = params.value
+              //         // this.props.setyear(params.value)
+              //         //...
+              //       }
+              //       return null;
+              //     }
+  
+              //   },
+              //   handle: {
+              //     show: false,
+              //     color: 'rgb(100,100,100)',
+              //     size: 20,
+              //   }
+              // },
+              boundaryGap: false,
+              data: d3.range(1999, 2021, 1)
+            }
+          ],
+          yAxis: [
+            {
+              type: 'value',
+              max: 6000
+            }
+          ],
+          series: seriesdata
+  
+        };
+  
+  
+        // var chartDom = document.getElementById('linestack');
+        // var myChart = echarts.init(chartDom);
+        // myChart.setOption(this.lineoption);
+  
+        // var chartDom = document.getElementById('linestack2');
+  
+        this.myChart.setOption(this.lineoption,{
+          notMerge: true
+         
+      });
+  
+      this.ltitle.innerText = this.statecode
+  
+      })
+      
+  
+    }
 
-        // tooltip: {
-        //   trigger: 'axis',
-        //   axisPointer: {
-
-        //     label: {
-        //       backgroundColor: '#6a7985'
-        //     }
-        //   }
-        // },
-        // legend: {
-        //   data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
-        // },
-
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '15%',
-          containLabel: true
-        },
-        xAxis: [
-          {
-            type: 'category',
-            // axisLabel:{interval:0,
-            //   // fontSize: 
-            // }  ,
-            // axisPointer: {
-            //   value: this.props.year,
-            //   snap: true,
-            //   lineStyle: {
-            //     color: 'rgb(100,100,100)',
-            //     width: 3
-            //   },
-            //   label: {
-            //     show: false,
-            //     formatter: (params) => {
-            //       console.log(params.value)
-            //       if (params.value !== this.year) {
-            //         // ...
-            //         this.year = params.value
-            //         // this.props.setyear(params.value)
-            //         //...
-            //       }
-            //       return null;
-            //     }
-
-            //   },
-            //   handle: {
-            //     show: false,
-            //     color: 'rgb(100,100,100)',
-            //     size: 20,
-            //   }
-            // },
-            boundaryGap: false,
-            data: d3.range(1999, 2021, 1)
-          }
-        ],
-        yAxis: [
-          {
-            type: 'value',
-            max: 2000
-          }
-        ],
-        series: seriesdata
-
-      };
-
-
-      // var chartDom = document.getElementById('linestack');
-      // var myChart = echarts.init(chartDom);
-      // myChart.setOption(this.lineoption);
-
-      // var chartDom = document.getElementById('linestack2');
-
-      this.myChart.setOption(this.lineoption);
-
-
-    })
-
+    
 
 
   }
@@ -479,7 +714,7 @@ class DotMapViewCombine extends React.Component {
       const minco = Math.min(minco1, minco2)
       const maxco = Math.max(maxco1, maxco2)
 
-      this.color.domain([minco, maxco]); // setting the range of the input data    
+      this.color.domain([0, maxco]); // setting the range of the input data    
 
       var stringified = JSON.stringify(statejson);
       var json = JSON.parse(stringified);
@@ -632,14 +867,16 @@ class DotMapViewCombine extends React.Component {
 
         })
 
-        targetsvgElement.append("text")
-        .attr("x", '55vw' )
+        targetsvgElement.select("#statefromtext").remove()
+
+      targetsvgElement.select("#statefromtext").append("text")
+        .attr("x", '55vw')
         .attr("y", '40vh')
         .attr("dy", ".35em")
         .style('font-size', '50px')
-        .text((d) =>{ return 'Death in ' + this.statecode + ' caused by other states.'; });
+        .text((d) => { return 'Death in ' + this.statecode + ' caused by other states.'; });
 
-        this.sspan.innerText   = this.statecode 
+      this.sspan.innerText = this.statecode
 
 
 
@@ -684,7 +921,7 @@ class DotMapViewCombine extends React.Component {
       const minco = d3.min(filteredData, d => parseFloat(d.deaths_coef_2))
       const maxco = d3.max(filteredData, d => parseFloat(d.deaths_coef_2))
 
-      this.color.domain([minco, maxco]); // setting the range of the input data    
+      this.color.domain([0, maxco]); // setting the range of the input data    
 
       var stringified = JSON.stringify(statejson);
       var json = JSON.parse(stringified);
@@ -762,14 +999,14 @@ class DotMapViewCombine extends React.Component {
 
         })
 
-        this.sspan.innerText   = 'No.' + this.FACID.toString() + ' facility' 
+      this.sspan.innerText = 'No.' + this.FACID.toString() + ' facility'
 
-        // svgElement.append("text")
-        // .attr("x", '60vw' )
-        // .attr("y", '40vh')
-        // .attr("dy", ".35em")
-        // .style('font-size', '50px')
-        // .text((d) =>{ return 'Death in ' + this.statecode + 'caused by other states.'; });
+      // svgElement.append("text")
+      // .attr("x", '60vw' )
+      // .attr("y", '40vh')
+      // .attr("dy", ".35em")
+      // .style('font-size', '50px')
+      // .text((d) =>{ return 'Death in ' + this.statecode + 'caused by other states.'; });
 
 
 
@@ -780,6 +1017,8 @@ class DotMapViewCombine extends React.Component {
       data.sort(function (a, b) {
         return parseFloat(b["deaths_coef_2_all"]) - parseFloat(a["deaths_coef_2_all"]);
       });
+      var rratio = 800
+      var rMaxSize = data[0].deaths_coef_2_all/rratio
 
       svgElement.selectAll("circle")
         .data(data)
@@ -792,10 +1031,16 @@ class DotMapViewCombine extends React.Component {
           return self.projection([d.lon, d.lat])[1];
         })
         .attr("r", function (d) {
-          return d.deaths_coef_2_all / 800;
+          return d.deaths_coef_2_all / rratio;
         })
         .style("stroke", "gray")
-        .style("fill", "rgb(217,91,67)")
+        .style("fill", d =>{
+          if(parseInt(d["FacID"])  === this.FACID){
+           return "#abd9e9"
+          }else{
+            return "rgb(217,91,67)"
+          }
+        })
         .style("opacity", 0.85)
 
         // Modification of custom tooltip code provided by Malcolm Maclean, "D3 Tips and Tricks" 
@@ -815,7 +1060,7 @@ class DotMapViewCombine extends React.Component {
           // self.props.setFACID(parseInt(d.target.__data__.FacID))
           self.deathGeoJson()
           self.prepMark()
-          self.checkbox.current.checked = true
+          self.checkbox.current.checked = true 
           // self.updateLegend()
 
 
@@ -837,6 +1082,55 @@ class DotMapViewCombine extends React.Component {
 
 
       //////////////////////read ftostate data
+
+
+      // The scale you use for bubble size
+     
+      var rsize = d3.scaleSqrt()
+        .domain([0,rMaxSize ])  // What's in the data, let's say it is percentage
+        .range([0, rMaxSize])  // Size in pixel
+
+      // Add legend: circles
+      var valuesToShow = [parseInt(rMaxSize),parseInt(2*rMaxSize/3), parseInt(rMaxSize/3)]
+      var xCircle = 780
+      var xLabel = 810
+      var yCircle = 350
+      svgElement
+        .selectAll("clegend")
+        .data(valuesToShow)
+        .enter()
+        .append("circle")
+        .attr("cx", xCircle)
+        .attr("cy", function (d) { return yCircle - rsize(d) })
+        .attr("r", function (d) { return rsize(d) })
+        .style("fill", "rgb(217,91,67)")
+        .attr("stroke", "black")
+
+      // Add legend: segments
+      svgElement
+        .selectAll("clegend")
+        .data(valuesToShow)
+        .enter()
+        .append("line")
+        .attr('x1', function (d) { return xCircle  })
+        .attr('x2', xLabel)
+        .attr('y1', function (d) { return yCircle - 2*rsize(d) })
+        .attr('y2', function (d) { return yCircle - 2*rsize(d) })
+        .attr('stroke', 'black')
+        .style('stroke-dasharray', ('2,2'))
+
+      // Add legend: labels
+      svgElement
+        .selectAll("clegend")
+        .data(valuesToShow)
+        .enter()
+        .append("text")
+        .attr('x', xLabel)
+        .attr('y', function (d) { return yCircle - 2*rsize(d) })
+        .text(function (d) { return d*rratio })
+        .style("font-size", 10)
+        .attr('alignment-baseline', 'middle')
+
 
 
 
@@ -990,7 +1284,7 @@ class DotMapViewCombine extends React.Component {
 
       // Add Y axis
       var y = d3.scaleLinear()
-        .domain([minf, maxf])
+        .domain([0, maxf])
         .range([height, 0]);
 
       svg.append("g")
@@ -1042,13 +1336,13 @@ class DotMapViewCombine extends React.Component {
           <div
             style={{ width: '50vw', }}>
             <Select
-             noOptionsMessage={()=>'Select a state to show...'}
+              noOptionsMessage={() => 'Select a state to show...'}
               value={this.statecode}
               onChange={this.handleChange}
               options={this.selectoptions}
             />
-            {this.FACID? <h1>Death attributes to <span style={{ color:'#db4e3e' }} ref={input => (this.sspan = input)}>{'No.' + this.FACID.toString() + ' facility'}</span> </h1>
-            :<h1>Death attributes to <span style={{ color:'#db4e3e' }} ref={input => (this.sspan = input)}>{  this.statecode }</span> state </h1>
+            {this.FACID ? <h1>Deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.sspan = input)}>{'No.' + this.FACID.toString() + ' facility'}</span> </h1>
+              : <h1>Deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.sspan = input)}>{this.statecode}</span> state </h1>
             }
 
             <svg
@@ -1106,10 +1400,15 @@ class DotMapViewCombine extends React.Component {
 
         </div>
         <div id="legend2" style={{ display: 'inline-block', position: 'absolute', top: '55vh', left: '40vw' }} ></div>
+        
         <div class="column"  >
+        
+        {this.FACID ? <h1>Statewide deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.ltitle = input)}>{' No.' + this.FACID.toString() + ' facility'}</span> </h1>
+              : <h1>Statewide deaths associated with emissions from  <span style={{ color: '#db4e3e' }} ref={input => (this.ltitle = input)}>{this.statecode}</span>  </h1>
+            }
           <div key={this.FACID} style={{ width: 'auto', height: '95vh', display: 'block' }} ref={this.div}>
-            <div style={{     position: "relative",    float: "left", left: "40vw" }}>
-              <span style={{ color: '#f1aca5',  position: 'relative', top: '5px', right: '10px', fontSize:'15px' }}>consistent scale</span>
+            <div style={{ position: "relative", float: "left", left: "36vw" }}>
+              <span style={{ color: '#f1aca5', position: 'relative', top: '5px', right: '10px', fontSize: '15px' }}>consistent scale</span>
               <label class="switch" >
                 <input type="checkbox" onChange={this.toggle} defaultChecked={true} ref={this.checkbox} />
                 <span class="slider round"></span>
