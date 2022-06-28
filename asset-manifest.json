@@ -1,16 +1,23 @@
 {
   "files": {
-    "main.css": "/CPIE/static/css/main.073c9b0a.css",
-    "main.js": "/CPIE/static/js/main.997f10e2.js",
+    "main.css": "/CPIE/static/css/main.1c904151.css",
+    "main.js": "/CPIE/static/js/main.d806e5c6.js",
     "static/js/787.51b4e4f1.chunk.js": "/CPIE/static/js/787.51b4e4f1.chunk.js",
+    "static/media/facility_to_state_year_sum2_fullname.csv": "/CPIE/static/media/facility_to_state_year_sum2_fullname.166980a4d5fd0b9755f1.csv",
+    "static/media/pm25_facility_state_sum_fullname.csv": "/CPIE/static/media/pm25_facility_state_sum_fullname.c27cd8685cd60a8e7ffa.csv",
+    "static/media/facility_to_state_sum_all_fullname.csv": "/CPIE/static/media/facility_to_state_sum_all_fullname.31629b2fc86be1a61057.csv",
+    "static/media/facility_to_state_year.csv": "/CPIE/static/media/facility_to_state_year.c9bc35fdd1ab22e218c6.csv",
+    "static/media/state_to_state_sum_all_fullname.csv": "/CPIE/static/media/state_to_state_sum_all_fullname.4685edc895bdd57611e1.csv",
+    "static/media/facility_shut_count.csv": "/CPIE/static/media/facility_shut_count.fe2e4902c88d8e31fc3b.csv",
+    "static/media/facility_scrubbed_count.csv": "/CPIE/static/media/facility_scrubbed_count.198337d49dd3e951e8de.csv",
     "static/media/logo.svg": "/CPIE/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/CPIE/index.html",
-    "main.073c9b0a.css.map": "/CPIE/static/css/main.073c9b0a.css.map",
-    "main.997f10e2.js.map": "/CPIE/static/js/main.997f10e2.js.map",
+    "main.1c904151.css.map": "/CPIE/static/css/main.1c904151.css.map",
+    "main.d806e5c6.js.map": "/CPIE/static/js/main.d806e5c6.js.map",
     "787.51b4e4f1.chunk.js.map": "/CPIE/static/js/787.51b4e4f1.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.073c9b0a.css",
-    "static/js/main.997f10e2.js"
+    "static/css/main.1c904151.css",
+    "static/js/main.d806e5c6.js"
   ]
 }
