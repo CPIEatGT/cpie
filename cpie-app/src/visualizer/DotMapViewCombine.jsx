@@ -15,7 +15,6 @@ import * as echarts from 'echarts';
 
 import statedata from "../data/facility_to_state_sum_all_fullname.csv";
 import statejson from "../data/gz_2010_us_040_00_500k.json"
-import facility_to_sate from "../data/facility_to_state_sum_all.csv"
 import facility_line_data from "../data/facility_to_state_year.csv"
 import stateselectdata from "../data/state_to_state_sum_all_fullname.csv";
 import stackdata from "../data/facility_to_state_year_sum2_fullname.csv";
