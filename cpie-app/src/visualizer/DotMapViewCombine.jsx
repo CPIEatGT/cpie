@@ -12,15 +12,19 @@ import Select from 'react-select';
 import Picker from 'react-mobile-picker-scroll';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
+import $ from 'jquery';
 
 import statedata from "../data/facility_to_state_sum_all_fullname.csv";
 import statejson from "../data/gz_2010_us_040_00_500k.json"
+import facIDname from "../data/facid_name3.json"
+import facDict from "../data/facid_name_dict.json"
 import facility_line_data from "../data/facility_to_state_year.csv"
 import stateselectdata from "../data/state_to_state_sum_all_fullname.csv";
 import stackdata from "../data/facility_to_state_year_sum2_fullname.csv";
 import facility_shut from "../data/facility_shut_count.csv"
 import facility_scrub from "../data/facility_scrubbed_count.csv"
 import statestack from "../data/pm25_facility_state_sum_fullname.csv"
+import { timeHours } from "d3";
 
 
 
@@ -28,6 +32,12 @@ import statestack from "../data/pm25_facility_state_sum_fullname.csv"
 class DotMapViewCombine extends React.Component {
 
   componentDidMount() {
+    // this.FacIDoptions(this)
+     var fstr = JSON.stringify(facDict);
+     this.fnameDict  = JSON.parse(fstr)[0];
+
+    
+
     this.deathGeoJson()
 
     // this.facilityLine(this.FACID)
@@ -50,6 +60,7 @@ class DotMapViewCombine extends React.Component {
   constructor(props) {
     super(props);
     this.FACID = 3
+    this.fname = 'Barry'
     this.statecode = null
     this.svg = React.createRef();
     this.div = React.createRef();
@@ -79,13 +90,15 @@ class DotMapViewCombine extends React.Component {
   //  @observable json 
 
   handleChange = selectedOption => {
+    $('#loading-image').show(); 
     this.FACID = null
+    this.fname = null
     this.props.setstatecode(selectedOption.value)
     this.statecode = selectedOption.value
     // this.deathGeoJson()
     this.stateSelect()
     this.stackLine({data:[]})
-    this.checkbox.current.checked = true 
+    // this.checkbox.current.checked = !this.checkbox.current.checked 
 
 
   };
@@ -107,6 +120,36 @@ class DotMapViewCombine extends React.Component {
     'value': 'Oklahoma',
     'label': 'Oklahoma'
   }, { 'value': 'Oregon', 'label': 'Oregon' }, { 'value': 'Palau', 'label': 'Palau' }, { 'value': 'Pennsylvania', 'label': 'Pennsylvania' }, { 'value': 'Puerto Rico', 'label': 'Puerto Rico' }, { 'value': 'Rhode Island', 'label': 'Rhode Island' }, { 'value': 'South Carolina', 'label': 'South Carolina' }, { 'value': 'South Dakota', 'label': 'South Dakota' }, { 'value': 'Tennessee', 'label': 'Tennessee' }, { 'value': 'Texas', 'label': 'Texas' }, { 'value': 'Utah', 'label': 'Utah' }, { 'value': 'Vermont', 'label': 'Vermont' }, { 'value': 'Virgin Island', 'label': 'Virgin Island' }, { 'value': 'Virginia', 'label': 'Virginia' }, { 'value': 'Washington', 'label': 'Washington' }, { 'value': 'West Virginia', 'label': 'West Virginia' }, { 'value': 'Wisconsin', 'label': 'Wisconsin' }, { 'value': 'Wyoming', 'label': 'Wyoming' }];
+
+  
+  FACIDhandleChange = selectedOption => {
+    // $('#loading-image').show(); 
+    // this.statecode = null
+    
+    // this.FACID = selectedOption.value
+    // // this.deathGeoJson()
+    // this.stateSelect()
+    // this.stackLine({data:[]})
+    // // this.checkbox.current.checked = !this.checkbox.current.checked 
+
+
+  };
+
+  // FacIDoptions = (self)=>{
+  //   var facidstr = JSON.stringify(facIDname);
+  //   var facidjson = JSON.parse(facidstr);
+  //   var filterfacidjson = facidjson.filter((d) => {
+     
+  //     if(d.value[0] === 'Alabama') {
+  //       return d;
+  //     }
+
+  //   })
+  //   self.selectref.options = filterfacidjson
+    
+  // }
+
+
 
 
   yearoptions = { year: d3.range(1999, 2021, 1) }
@@ -168,6 +211,7 @@ class DotMapViewCombine extends React.Component {
   prepMark() {
     d3.csv(facility_shut).then((shutdata) => {
 
+      var sumunit = 0
       var shutfilteredData = shutdata.filter((d) => {
 
         if ((d["FacID"] == this.FACID && d.year_shut >=1999 && d.year_shut <=2020)) {
@@ -175,11 +219,19 @@ class DotMapViewCombine extends React.Component {
         }
 
       })
+      
       var marklist = []
       shutfilteredData.forEach((sd) => {
+        sumunit += parseInt(sd.uID)
         // if (sd.year_shut > 2020 || sd.year_shut <1999) continue;
+        var text 
+        if( parseInt(sd.uID) >1){
+          text = sd.uID.toString() + " units retired"
+        }else{
+          text = sd.uID.toString() + " unit retired"
+        }
 
-        var text = sd.uID.toString() + " unit retired"
+        
         
         marklist.push(
           {
@@ -209,7 +261,16 @@ class DotMapViewCombine extends React.Component {
         })
 
         scrubfilteredData.forEach((sd) => {
-          var text =  "Scrubber installed\non " + sd.uID.toString() + " unit"
+          sumunit += parseInt(sd.uID)
+
+          var text 
+          if( parseInt(sd.uID) >1){
+            text = "Scrubber installed\non " + sd.uID.toString() + " units"
+          }else{
+            text = "Scrubber installed\non " + sd.uID.toString() + " unit"
+          }
+
+       
           marklist.push(
             {
               coord: [parseInt(sd.year_scrubbed).toString(), 0],
@@ -226,7 +287,7 @@ class DotMapViewCombine extends React.Component {
           )
         })
 
-        var markDict = {
+        var markDict = [{
           symbolSize: 40,
           //   symbol:'circle',
           //  symbolOffset:[-10,20],
@@ -236,8 +297,10 @@ class DotMapViewCombine extends React.Component {
           symbolRotate: 180,
           symbolOffset: [0, 20],
           data: marklist
-        }
-        console.log(markDict)
+        },{
+          sum: sumunit 
+        }]
+        // console.log(markDict)
 
 
         this.stackLine(markDict)
@@ -249,7 +312,7 @@ class DotMapViewCombine extends React.Component {
   }
 
   stackLine(markDict) {
-    console.log(markDict)
+    // console.log(markDict)
 
     if(this.FACID){
       d3.csv(stackdata).then((data) => {
@@ -333,9 +396,12 @@ class DotMapViewCombine extends React.Component {
         })
   
         if (seriesdata.length > 0) {
-          seriesdata[0].markPoint = markDict
+          seriesdata[0].markPoint = markDict[0]
         }
-  
+
+         
+
+        
   
   
         this.lineoption = {
@@ -359,11 +425,24 @@ class DotMapViewCombine extends React.Component {
           //   text: 'Statewide deaths associated\nwith emissions from No.' + this.FACID + ' facility',
           //   left: 'left'
           // },
+
+          title: {
+            text: markDict[1].sum>1? 'Records for '+ markDict[1].sum.toString() + ' units' : 'Records for '+ markDict[1].sum.toString() + ' unit',
+      
+       
+            textStyle: {
+              fontWeight: 'normal',
+              fontSize: 10,
+              lineHeight: 20
+            },
+            right: '5%',
+            top: '60%'
+          },
           legend: {
             orient: 'vertical',
             left: 'right',
             type: 'scroll',//does not work
-            height: 366,
+            height: 320,
             formatter: name => {
               var series = this.myChart.getOption().series;
               var value = series.filter(row => row.name === name)[0].sum
@@ -393,7 +472,7 @@ class DotMapViewCombine extends React.Component {
           grid: {
             left: '3%',
             right: '4%',
-            bottom: '30%',
+            bottom: '32%',
             containLabel: true
           },
           xAxis: [
@@ -436,7 +515,7 @@ class DotMapViewCombine extends React.Component {
           yAxis: [
             {
               type: 'value',
-              max: 2000
+              max: this.checkbox.current.checked? 2000:null
             }
           ],
           series: seriesdata
@@ -455,8 +534,12 @@ class DotMapViewCombine extends React.Component {
          
       });
   
-      this.ltitle.innerText = 'No.' + this.FACID.toString() + ' facility'
-      })
+      this.ltitle.innerText = 'Facility ' +  this.fnameDict[parseInt(this.FACID)]
+
+      // this.FACID.toString() 
+      $('#loading-image').hide();
+    
+    })
       
       
     }else if(this.statecode){
@@ -571,7 +654,7 @@ class DotMapViewCombine extends React.Component {
             orient: 'vertical',
             left: 'right',
             type: 'scroll',//does not work
-            height: 366,
+            height: 320,
             formatter: name => {
               var series = this.myChart.getOption().series;
               var value = series.filter(row => row.name === name)[0].sum
@@ -643,7 +726,7 @@ class DotMapViewCombine extends React.Component {
           yAxis: [
             {
               type: 'value',
-              max: 6000
+              max: this.checkbox.current.checked? 6000:null
             }
           ],
           series: seriesdata
@@ -663,7 +746,7 @@ class DotMapViewCombine extends React.Component {
       });
   
       this.ltitle.innerText = this.statecode
-  
+      $('#loading-image').hide();
       })
       
   
@@ -868,14 +951,19 @@ class DotMapViewCombine extends React.Component {
 
         targetsvgElement.select("#statefromtext").remove()
 
-      targetsvgElement.select("#statefromtext").append("text")
-        .attr("x", '55vw')
-        .attr("y", '40vh')
-        .attr("dy", ".35em")
-        .style('font-size', '50px')
-        .text((d) => { return 'Death in ' + this.statecode + ' caused by other states.'; });
+      // targetsvgElement.append("text")
+      //   .attr("id", "statefromtext")
+      //   // .attr("x", '40vw')
+      //   // .attr("y", '30vh')
+      //   .attr("dy", ".35em")
+      //   .style('font-size', '50px')
+      //   .style("position", "absolute")
+      //   .style("top",  "50vh")
+      //   .style("left",  "10vw")
+      //   .text((d) => { return  this.statecode + ' deaths attributable to facilities in other states'; });
 
       this.sspan.innerText = this.statecode
+      this.mtitle.innerText = this.statecode + ' deaths attributable to facilities in other states'
 
 
 
@@ -897,6 +985,7 @@ class DotMapViewCombine extends React.Component {
   }
 
   deathGeoJson() {
+    $('#loading-image').show(); 
 
 
     d3.csv(statedata).then((data) => {
@@ -998,7 +1087,8 @@ class DotMapViewCombine extends React.Component {
 
         })
 
-      this.sspan.innerText = 'No.' + this.FACID.toString() + ' facility'
+      this.sspan.innerText = 'Facility ' + this.fnameDict[parseInt(this.FACID)]
+      // + this.FACID.toString() 
 
       // svgElement.append("text")
       // .attr("x", '60vw' )
@@ -1049,6 +1139,7 @@ class DotMapViewCombine extends React.Component {
           const targetsvgElement = d3.select(self.targetsvg)
           // targetsvgElement.append("g").attr("id", "tstatepath")
           targetsvgElement.select("#tstatepath").selectAll("path").remove()
+          self.mtitle.innerText = ''
 
           self.FACID = parseInt(d.target.__data__.FacID)
 
@@ -1059,7 +1150,7 @@ class DotMapViewCombine extends React.Component {
           // self.props.setFACID(parseInt(d.target.__data__.FacID))
           self.deathGeoJson()
           self.prepMark()
-          self.checkbox.current.checked = true 
+           
           // self.updateLegend()
 
 
@@ -1332,17 +1423,34 @@ class DotMapViewCombine extends React.Component {
 
       <div>
         <div class="column" >
+          
           <div
             style={{ width: '50vw', }}>
+              {this.FACID ? <h1>Deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.sspan = input)}>{ 'Facility ' + this.fname }</span> </h1>
+              : <h1>Deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.sspan = input)}>{this.statecode}</span> state </h1>
+            }
+            <div style={{ width: '300px', height:'30px', position:'absolute', top:'10vh', left:'18vw' }}>
             <Select
-              noOptionsMessage={() => 'Select a state to show...'}
+              // noOptionsMessage={() => 'Select a state to show...'}
+              // LoadingMessage = {()=> 'Select a state to show...'}
+              
+              placeholder='Select a state to show...'
               value={this.statecode}
               onChange={this.handleChange}
               options={this.selectoptions}
             />
-            {this.FACID ? <h1>Deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.sspan = input)}>{'No.' + this.FACID.toString() + ' facility'}</span> </h1>
-              : <h1>Deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.sspan = input)}>{this.statecode}</span> state </h1>
-            }
+            </div>
+            
+            {/* {
+
+            <Select
+              noOptionsMessage={() => 'Select a facility to show...'}
+              value={this.FACID}
+              onChange={this.FACIDhandleChange}
+              options={this.filterfacidjson}
+              ref={input => (this.selectref = input)}
+            />} */}
+            
 
             <svg
               // width={this.width}
@@ -1358,7 +1466,7 @@ class DotMapViewCombine extends React.Component {
 
 
             </svg>
-            {/* <h2>Death in <span style={{ color:'blue' }} ref={input => (this.tspan = input)}>{this.statecode}</span> caused by other states</h2> */}
+            <h3 style={{ position: 'absolute', top: '62vh'}}> <span  ref={input => (this.mtitle = input)}></span> </h3>
 
             <svg
               // width={this.width}
@@ -1402,7 +1510,7 @@ class DotMapViewCombine extends React.Component {
         
         <div class="column"  >
         
-        {this.FACID ? <h1>Statewide deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.ltitle = input)}>{' No.' + this.FACID.toString() + ' facility'}</span> </h1>
+        {this.FACID ? <h1>Statewide deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.ltitle = input)}>{'Facility ' + this.fname  }</span> </h1>
               : <h1>Statewide deaths associated with emissions from  <span style={{ color: '#db4e3e' }} ref={input => (this.ltitle = input)}>{this.statecode}</span>  </h1>
             }
           <div key={this.FACID} style={{ width: 'auto', height: '95vh', display: 'block' }} ref={this.div}>
