@@ -41,6 +41,18 @@
   }
 }
 
+#loading-image
+    {
+        background: white url("http://smallenvelop.com/demo/simple-pre-loader/images/loader-64x/Preloader_2.gif") no-repeat scroll center center;;
+        height: 100%;
+        left: 0;
+        position: fixed;
+        top: 10;
+        opacity: .5;
+        width: 100%;
+        z-index: 9999;
+    }
+
 
 /* On mouse hover, lighten state color */
 /* path:hover {

@@ -53,6 +53,7 @@ class App extends React.Component {
     return (
       <div className="App">
          <DotMapViewCombine year = {this.year} statecode = {this.statecode} setFACID={FACID => this.setFACID(FACID)} setstatecode={statecode => this.setstatecode(statecode)}/>
+      <div id="loading-image" style={{display:"none"}}></div>
       </div>
     )
   }
