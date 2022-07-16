@@ -17,24 +17,24 @@ stated = {"AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"Cali
 # print(dict)
 
 # group sum 
-df = pd.read_csv(r'pm25_facility_state.csv')
+df = pd.read_csv(r'C:\Users\coduser\Documents\GitHub\CPIE\cpie-app\src\data\pm25_facility_state.csv')
 
 # df.groupby(['FacID','year_shut' ]).count().to_csv('./cpie-app/src/data/facility_shut_count.csv') 
-# for i in stated.keys():
-#     df.replace(to_replace =i, 
-#                  value = stated[i], 
-#                   inplace = True)
-df1 = df.groupby(['FacID' ]).agg({'Facility.Name':'first', 'state_facility':'first'})
-# dictl = [{"label": r["Facility.Name"] ,  "value" : [r['state_facility'] ,r['FacID']] } for  index, r in df.iterrows() ]
-
-dict2 = [{ r['FacID']: r["Facility.Name"] for  index, r in df.iterrows()}]
-print(len(dict2))
-with open("facid_name_dict.json", "w") as final:
-   json.dump(dict2, final)
+for i in stated.keys():
+    df.replace(to_replace =i, 
+                 value = stated[i], 
+                  inplace = True)
+# df1 = df.groupby(['FacID' ]).agg({'FacID':'first','Facility.Name':'first', 'state_facility':'first'})
+# # dictl = [{"label": r["Facility.Name"] + ', ' + r['state_facility'] ,  "value" : [r['state_facility'] ,r['FacID']] } for  index, r in df.iterrows() ]
+# # udict = list({v['label']:v for v in dictl}.values())
+# dict2 = [{ r['FacID']: [r["Facility.Name"],r["state_facility"]]  for  index, r in df1.iterrows()}]
+# # print(len(dict2))
+# with open("facid_name_dict2.json", "w") as final:
+#    json.dump(dict2, final)
 # print(dictl)
 # addToClipBoard(str(dictl))
 
-# df2 = df.groupby(['FacID'])[ 'deaths_coef_2'].sum().reset_index().rename(columns={'deaths_coef_2':'deaths_coef_2_all'})
+df2 = df.groupby(['state_zip'])[ 'deaths_coef_2'].sum().reset_index().rename(columns={'deaths_coef_2':'deaths_coef_2_all'}).to_csv('landing_state_overall.csv')
 # df1 = pd.read_csv(r'./cpie-app/src/data/facility_to_state_sum.csv')
 
 # pd.merge(df1, df2, on="FacID").to_csv('./cpie-app/src/data/facility_to_state_sum_all.csv')
