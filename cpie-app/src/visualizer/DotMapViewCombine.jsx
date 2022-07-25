@@ -24,6 +24,8 @@ import stackdata from "../data/facility_to_state_year_sum2_fullname.csv";
 import facility_shut from "../data/facility_shut_count.csv"
 import facility_scrub from "../data/facility_scrubbed_count.csv"
 import statestack from "../data/pm25_facility_state_sum_fullname.csv"
+import landingstate from "../data/landing_state_overall.csv"
+import landingstack from "../data/landing_state_overall_year.csv"
 import { timeHours } from "d3";
 
 
@@ -39,7 +41,7 @@ class DotMapViewCombine extends React.Component {
 
 
 
-    this.deathGeoJson()
+    // this.deathGeoJson()
 
     // this.facilityLine(this.FACID)
     this.myChart = echarts.init(this.div.current, null, { renderer: 'svg' });
@@ -52,7 +54,8 @@ class DotMapViewCombine extends React.Component {
 
     };
 
-    this.prepMark()
+    // this.prepMark()
+    this.landingview()
   }
 
   componentDidUpdate(prevProps) {
@@ -72,6 +75,7 @@ class DotMapViewCombine extends React.Component {
     this.div = React.createRef();
     this.checkbox = React.createRef();
     this.dotcheckbox = React.createRef();
+    this.color = d3.scaleSequential(interpolateOrRd)
     this.dottooltip = d3.select("body")
       .append("div")
       .attr("class", "tooltip")
@@ -130,8 +134,9 @@ class DotMapViewCombine extends React.Component {
     this.stateSelect()
     this.stackLine({ data: [] })
     this.dottooltip.transition()
-    .duration(500)
-    .style("opacity", 0);
+      .duration(500)
+      .style("opacity", 0);
+      
     // this.checkbox.current.checked = !this.checkbox.current.checked 
     // var filterfacidjson = [
     //   { 'value': 'Alabama', 'label': 'Alabama' }, { 'value': 'Alaska', 'label': 'Alaska' } ]
@@ -166,33 +171,40 @@ class DotMapViewCombine extends React.Component {
     // $('#loading-image').show(); 
     this.statecode = null
 
-    this.FACID = selectedOption.value
+    this.FACID = selectedOption.value[1]
     // // this.deathGeoJson()
     // this.stateSelect()
     // this.stackLine({data:[]})
     // // this.checkbox.current.checked = !this.checkbox.current.checked 
     const targetsvgElement = d3.select(this.targetsvg)
-          // targetsvgElement.append("g").attr("id", "tstatepath")
-          targetsvgElement.select("#tstatepath").selectAll("path").remove()
-          this.mtitle.innerText = ''
+    // targetsvgElement.append("g").attr("id", "tstatepath")
+    targetsvgElement.select("#tstatepath").selectAll("path").remove()
+    this.mtitle.innerText = ''
 
-         
-          d3.selectAll("circle")
-          .style("fill", d => {
-            if (parseInt(d["FacID"]) === this.FACID) {
-              return "#abd9e9"
-            } else {
-              return "rgb(217,91,67)"
-            }
-          })
-          .style("opacity", ()=> this.dotcheckbox.current.checked ? 0.85: 0)
-         
-          
-          
-          // self.facilityLine(self.FACID)
-          // self.props.setFACID(parseInt(d.target.__data__.FacID))
-          this.deathGeoJson()
-          this.prepMark()
+    this.deathGeoJson()
+    this.prepMark()
+
+    d3.selectAll("circle")
+      .style("fill", d => {
+        if (parseInt(d["FacID"]) === this.FACID) {
+          return "#abd9e9"
+        } else {
+          return "rgb(217,91,67)"
+        }
+      })
+      .style("opacity", (d) => {
+        if (parseInt(d["FacID"]) === this.FACID) {
+        return 0.85
+      } else {
+        return this.dotcheckbox.current.checked ? 0.2 : 0
+      }
+        })
+
+
+
+    // self.facilityLine(self.FACID)
+    // self.props.setFACID(parseInt(d.target.__data__.FacID))
+   
 
 
   };
@@ -227,11 +239,12 @@ class DotMapViewCombine extends React.Component {
     .projection(this.projection);  // tell path generator to use albersUsa projection
 
 
+
   // Define linear scale for output
   //  color = d3.scaleLinear()
   // 			  .range(['rgb(254,232,200)',"rgb(179,0,0)"]);
 
-  color = d3.scaleSequential(interpolateOrRd)
+
   // .domain([0, 10000])
 
   // legendText = ["Cities Lived", "States Lived", "States Visited", "Nada"];
@@ -270,12 +283,29 @@ class DotMapViewCombine extends React.Component {
     // console.log(event.target.checked)
   }
 
-  dottoggle = event=>{
+  dottoggle = event => {
+    const svgElement = d3.select(this.svg.current)
     if (event.target.checked) {
       d3.selectAll("circle").style("opacity", .85)
 
-    }else{
+      svgElement
+        .selectAll("text")
+        .style("font-size", 10)
+
+      svgElement
+        .selectAll("line")
+        .style("stroke", "black")
+
+
+    } else {
       d3.selectAll("circle").style("opacity", 0)
+      svgElement
+        .selectAll("text")
+        .style("font-size", 0)
+
+      svgElement
+        .selectAll("line")
+        .style("stroke", "white")
     }
   }
 
@@ -286,17 +316,17 @@ class DotMapViewCombine extends React.Component {
       var sumunit = 0
       var sumshutdata = shutdata.filter((d) => {
 
-        if ((d["FacID"] == this.FACID )) {
+        if ((d["FacID"] == this.FACID)) {
           return d;
         }
 
       })
-      sumunit += sumshutdata.reduce((total, obj) => parseInt(obj.uID) + total,0)
+      sumunit += sumshutdata.reduce((total, obj) => parseInt(obj.uID) + total, 0)
 
 
       var shutfilteredData = sumshutdata.filter((d) => {
 
-        if (( d.year_shut >= 1999 && d.year_shut <= 2020)) {
+        if ((d.year_shut >= 1999 && d.year_shut <= 2020)) {
           return d;
         }
 
@@ -304,7 +334,7 @@ class DotMapViewCombine extends React.Component {
 
       var marklist = []
       shutfilteredData.forEach((sd) => {
-        
+
         // if (sd.year_shut > 2020 || sd.year_shut <1999) continue;
         var text
         if (parseInt(sd.uID) > 1) {
@@ -342,18 +372,18 @@ class DotMapViewCombine extends React.Component {
 
         })
 
-        sumunit += sumscrubdata.reduce((total, obj) => parseInt(obj.uID) + total,0)
+        sumunit += sumscrubdata.reduce((total, obj) => parseInt(obj.uID) + total, 0)
 
         var scrubfilteredData = sumscrubdata.filter((d) => {
 
-          if (( d.year_scrubbed >= 1999 && d.year_scrubbed <= 2020)) {
+          if ((d.year_scrubbed >= 1999 && d.year_scrubbed <= 2020)) {
             return d;
           }
 
         })
 
         scrubfilteredData.forEach((sd) => {
-         
+
 
           var text
           if (parseInt(sd.uID) > 1) {
@@ -528,13 +558,13 @@ class DotMapViewCombine extends React.Component {
               lineHeight: 20
             },
             right: '5%',
-            top: '60%'
+            top: '57%'
           },
           legend: {
             orient: 'vertical',
             left: 'right',
             type: 'scroll',//does not work
-            height: 320,
+            height: 300,
             formatter: name => {
               var series = this.myChart.getOption().series;
               var value = series.filter(row => row.name === name)[0].sum
@@ -564,7 +594,7 @@ class DotMapViewCombine extends React.Component {
           grid: {
             left: '3%',
             right: '4%',
-            bottom: '32%',
+            bottom: '35%',
             containLabel: true
           },
           xAxis: [
@@ -632,85 +662,85 @@ class DotMapViewCombine extends React.Component {
           // let zrTimeout = setTimeout(() => {
 
 
-            // get the polyline/polygon drawing element from the ZRender component which is servicing a series and is in emphasis/highlight state
-            const seriesPolyShape = this.myChart.getZr().storage._displayList.find(d => d.currentStates[0] === "emphasis" && d.parent?.parent?.__ecComponentInfo?.mainType === "series")
+          // get the polyline/polygon drawing element from the ZRender component which is servicing a series and is in emphasis/highlight state
+          const seriesPolyShape = this.myChart.getZr().storage._displayList.find(d => d.currentStates[0] === "emphasis" && d.parent?.parent?.__ecComponentInfo?.mainType === "series")
 
-            // get the series index
-            
+          // get the series index
 
-            var highlightedSeriesIndex 
-            Object.values(params.target).forEach(val => {
-              if(typeof(val) === 'object' && (typeof(val['seriesIndex']) !== "undefined")) {
-                highlightedSeriesIndex = val['seriesIndex']
-                return 
-              }
-            });
-            // seriesPolyShape?.parent?.parent?.__ecComponentInfo?.index
-            // params.target.__ec_inner_7.seriesIndex
 
-            if ((typeof (highlightedSeriesIndex) === "undefined") ) {
-              this.dottooltip.transition()
+          var highlightedSeriesIndex
+          Object.values(params.target).forEach(val => {
+            if (typeof (val) === 'object' && (typeof (val['seriesIndex']) !== "undefined")) {
+              highlightedSeriesIndex = val['seriesIndex']
+              return
+            }
+          });
+          // seriesPolyShape?.parent?.parent?.__ecComponentInfo?.index
+          // params.target.__ec_inner_7.seriesIndex
+
+          if ((typeof (highlightedSeriesIndex) === "undefined")) {
+            this.dottooltip.transition()
               .duration(500)
               .style("opacity", 0);
 
-              const svgElement = d3.select(this.svg.current)
+            const svgElement = d3.select(this.svg.current)
 
-              svgElement.select("#statepath").selectAll("path")
-                .style("stroke",
-                  "#fff"
-
-
-                )
-                .style("stroke-width",
-                  "1"
-
-                )
-                return 
-                 
-
-            }else{
-
-              this.lastserieshover = highlightedSeriesIndex
-
-              var series = this.myChart.getOption().series;
-              var sumvalue = series[highlightedSeriesIndex].sum
-              var statename = series[highlightedSeriesIndex].name
+            svgElement.select("#statepath").selectAll("path")
+              .style("stroke",
+                "#fff"
 
 
-              // tooltip 
-              const pointInPixel = [params.offsetX, params.offsetY];
-              const pointInGrid = this.myChart.convertFromPixel('grid', pointInPixel);
-              this.dottooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
-              this.dottooltip.text( "Causes around" + Math.ceil(sumvalue / 10) * 10 + " deaths in " + statename )
-                .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw' )
-                .style("top", (params.offsetY ) + "px");
+              )
+              .style("stroke-width",
+                "1"
 
-              const svgElement = d3.select(this.svg.current)
+              )
+            return
 
-              svgElement.select("#statepath").selectAll("path")
-                .style("stroke", (d, i) => {
-                  if (d.properties.NAME === statename) {
-                    console.log(statename)
-                    console.log(d.properties.NAME)
-                    return "rgb(100,100,100)"
-                  } else {
-                    return "#fff"
-                  }
 
-                })
-                .style("stroke-width", (d) => {
-                  if (d.properties.NAME === statename) {
-                    return "4"
-                  } else {
-                    return "1"
-                  }
-                })
+          } else {
 
-            }
-            
-           
+            this.lastserieshover = highlightedSeriesIndex
+
+            var series = this.myChart.getOption().series;
+            var sumvalue = series[highlightedSeriesIndex].sum
+            var statename = series[highlightedSeriesIndex].name
+
+
+            // tooltip 
+            const pointInPixel = [params.offsetX, params.offsetY];
+            const pointInGrid = this.myChart.convertFromPixel('grid', pointInPixel);
+            this.dottooltip.transition()
+              .duration(200)
+              .style("opacity", .9);
+            this.dottooltip.text("Causes around " + Math.ceil(sumvalue / 10) * 10 + " deaths in " + statename)
+              .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw')
+              .style("top", (params.offsetY+50) + "px");
+
+            const svgElement = d3.select(this.svg.current)
+
+            svgElement.select("#statepath").selectAll("path")
+              .style("stroke", (d, i) => {
+                if (d.properties.NAME === statename) {
+                  console.log(statename)
+                  console.log(d.properties.NAME)
+                  return "rgb(100,100,100)"
+                } else {
+                  return "#fff"
+                }
+
+              })
+              .style("stroke-width", (d) => {
+                if (d.properties.NAME === statename) {
+                  return "4"
+                } else {
+                  return "1"
+                }
+              })
+
+          }
+
+
 
           // }, 5)
 
@@ -720,8 +750,8 @@ class DotMapViewCombine extends React.Component {
 
         this.myChart.getZr().on('mouseout', (params) => {
           this.dottooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
+            .duration(500)
+            .style("opacity", 0);
 
           const svgElement = d3.select(this.svg.current)
 
@@ -737,7 +767,9 @@ class DotMapViewCombine extends React.Component {
             )
         })
 
-        this.ltitle.innerText =  this.fnameDict[parseInt(this.FACID)][0] + ',' + this.fnameDict[parseInt(this.FACID)][1] + 'Facility ' 
+        this.ltitle.innerText = 'Statewide deaths associated with emissions from ' + this.fnameDict[parseInt(this.FACID)][0] + ', ' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
+
+        // `Statewide deaths associated with emissions from <span style={{ color: '#db4e3e' }} >`+ this.fnameDict[parseInt(this.FACID)][0] + ',' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility ' + `</span> `
 
         // this.FACID.toString() 
         $('#loading-image').hide();
@@ -857,7 +889,7 @@ class DotMapViewCombine extends React.Component {
             orient: 'vertical',
             left: 'right',
             type: 'scroll',//does not work
-            height: 320,
+            height: 300,
             formatter: name => {
               var series = this.myChart.getOption().series;
               var value = series.filter(row => row.name === name)[0].sum
@@ -948,96 +980,98 @@ class DotMapViewCombine extends React.Component {
 
         });
 
-        this.myChart.getZr().on('click', (params) => {
-          // set a small delay before continuing to ensure that series highlight/emphasis-state has already taken effect within Echarts. A single tick is not enough.
-          // let zrTimeout = setTimeout(() => {
+        // this.myChart.getZr().on('click', (params) => {
+        //   // set a small delay before continuing to ensure that series highlight/emphasis-state has already taken effect within Echarts. A single tick is not enough.
+        //   // let zrTimeout = setTimeout(() => {
 
 
-            // get the polyline/polygon drawing element from the ZRender component which is servicing a series and is in emphasis/highlight state
-            const seriesPolyShape = this.myChart.getZr().storage._displayList.find(d => d.currentStates[0] === "emphasis" && d.parent?.parent?.__ecComponentInfo?.mainType === "series")
+        //     // get the polyline/polygon drawing element from the ZRender component which is servicing a series and is in emphasis/highlight state
+        //     const seriesPolyShape = this.myChart.getZr().storage._displayList.find(d => d.currentStates[0] === "emphasis" && d.parent?.parent?.__ecComponentInfo?.mainType === "series")
 
-            // get the series index
-
-
-            var highlightedSeriesIndex =   seriesPolyShape?.parent?.parent?.__ecComponentInfo?.index
-            // params.target.__ec_inner_7.seriesIndex
-
-            if ((typeof (highlightedSeriesIndex) === "undefined") ) {
-              this.dottooltip.transition()
-              .duration(500)
-              .style("opacity", 0);
-
-              const svgElement = d3.select(this.svg.current)
-
-              svgElement.select("#statepath").selectAll("path")
-                .style("stroke",
-                  "#fff"
+        //     // get the series index
 
 
-                )
-                .style("stroke-width",
-                  "1"
+        //     var highlightedSeriesIndex =   seriesPolyShape?.parent?.parent?.__ecComponentInfo?.index
+        //     // params.target.__ec_inner_7.seriesIndex
 
-                )
-                return 
-                 
+        //     if ((typeof (highlightedSeriesIndex) === "undefined") ) {
+        //       this.dottooltip.transition()
+        //       .duration(500)
+        //       .style("opacity", 0);
 
-            }
-            
-            if( (highlightedSeriesIndex !== this.lastserieshover)) {
+        //       const svgElement = d3.select(this.svg.current)
 
-              this.lastserieshover = highlightedSeriesIndex
-
-              var series = this.myChart.getOption().series;
-              var sumvalue = series[highlightedSeriesIndex].sum
-              var statename = series[highlightedSeriesIndex].name
+        //       svgElement.select("#statepath").selectAll("path")
+        //         .style("stroke",
+        //           "#fff"
 
 
-              // tooltip 
-              const pointInPixel = [params.offsetX, params.offsetY];
-              const pointInGrid = this.myChart.convertFromPixel('grid', pointInPixel);
-              this.dottooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
-              this.dottooltip.text( "Causes around" + Math.ceil(sumvalue / 10) * 10 + " deaths in " + statename )
-                .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw' )
-                .style("top", (params.offsetY ) + "px");
+        //         )
+        //         .style("stroke-width",
+        //           "1"
 
-              const svgElement = d3.select(this.svg.current)
-
-              svgElement.select("#statepath").selectAll("path")
-                .style("stroke", (d, i) => {
-                  if (d.properties.NAME === statename) {
-                    console.log(statename)
-                    console.log(d.properties.NAME)
-                    return "rgb(100,100,100)"
-                  } else {
-                    return "#fff"
-                  }
-
-                })
-                .style("stroke-width", (d) => {
-                  if (d.properties.NAME === statename) {
-                    return "4"
-                  } else {
-                    return "1"
-                  }
-                })
+        //         )
+        //         return 
 
 
+        //     }
+
+        //     if( (highlightedSeriesIndex !== this.lastserieshover)) {
+
+        //       this.lastserieshover = highlightedSeriesIndex
+
+        //       var series = this.myChart.getOption().series;
+        //       var sumvalue = series[highlightedSeriesIndex].sum
+        //       var statename = series[highlightedSeriesIndex].name
 
 
-            }
+        //       // tooltip 
+        //       const pointInPixel = [params.offsetX, params.offsetY];
+        //       const pointInGrid = this.myChart.convertFromPixel('grid', pointInPixel);
+        //       this.dottooltip.transition()
+        //         .duration(200)
+        //         .style("opacity", .9);
+        //       this.dottooltip.text( "Causes around" + Math.ceil(sumvalue / 10) * 10 + " deaths in " + statename )
+        //         .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw' )
+        //         .style("top", (params.offsetY ) + "px");
 
-           
+        //       const svgElement = d3.select(this.svg.current)
 
-          // }, 5)
+        //       svgElement.select("#statepath").selectAll("path")
+        //         .style("stroke", (d, i) => {
+        //           if (d.properties.NAME === statename) {
+        //             console.log(statename)
+        //             console.log(d.properties.NAME)
+        //             return "rgb(100,100,100)"
+        //           } else {
+        //             return "#fff"
+        //           }
+
+        //         })
+        //         .style("stroke-width", (d) => {
+        //           if (d.properties.NAME === statename) {
+        //             return "4"
+        //           } else {
+        //             return "1"
+        //           }
+        //         })
 
 
 
-        })
 
-        this.ltitle.innerText = this.statecode
+        //     }
+
+
+
+        //   // }, 5)
+
+
+
+        // })
+
+        this.ltitle.innerText = 'Statewide deaths associated with emissions from ' + this.statecode
+
+        // this.statecode
         $('#loading-image').hide();
       })
 
@@ -1122,8 +1156,10 @@ class DotMapViewCombine extends React.Component {
       // Bind the data to the SVG and create one path per GeoJSON feature
 
       const svgElement = d3.select(this.svg.current)
-      svgElement.append("g").attr("id", "statepath")
+      const g = svgElement.append("g").attr("id", "statepath")
       svgElement.select("#statepath").selectAll("path").remove()
+
+
 
       svgElement.select("#statepath").selectAll("path")
         .data(json.features)
@@ -1166,6 +1202,23 @@ class DotMapViewCombine extends React.Component {
           // this.updateLegend()
 
         })
+      const zoom = d3.zoom()
+        .scaleExtent([1, 8])
+        .on('zoom', (event) => {
+          svgElement.select("#statepath")
+            .selectAll('path') // To prevent stroke width from scaling
+            .attr('transform', event.transform);
+          svgElement.selectAll("circle")
+            .attr('transform', event.transform);
+            svgElement
+            .selectAll("line")
+            .attr('transform', event.transform);
+            svgElement
+            .selectAll("text")
+            .attr('transform', event.transform);
+        });
+
+      svgElement.call(zoom);
 
 
       // update target map
@@ -1255,7 +1308,7 @@ class DotMapViewCombine extends React.Component {
       //   .style("left",  "10vw")
       //   .text((d) => { return  this.statecode + ' deaths attributable to facilities in other states'; });
 
-      this.sspan.innerText = this.statecode
+      this.ltitle.innerText = "Statewide deaths associated with emissions from " + this.statecode
       this.mtitle.innerText = this.statecode + ' deaths attributable to facilities in other states'
 
 
@@ -1269,7 +1322,25 @@ class DotMapViewCombine extends React.Component {
 
 
       }
-      ).style("opacity", ()=> this.dotcheckbox.current.checked ? 0.85: 0)
+      ).style("opacity", (d) =>{ 
+        if (d.state_facility === this.statecode) {
+          return 0.85
+        } else {
+          return this.dotcheckbox.current.checked ? 0.2 : 0
+        }
+        
+      })
+      if(!this.dotcheckbox.current.checked){
+        svgElement
+        .selectAll("text")
+        .style("font-size", 0)
+
+      svgElement
+        .selectAll("line")
+        .style("stroke", "white")
+      }
+      
+
       this.updateLegend(this.color)
 
     })
@@ -1297,7 +1368,7 @@ class DotMapViewCombine extends React.Component {
 
       })
 
-      
+
 
 
 
@@ -1337,8 +1408,12 @@ class DotMapViewCombine extends React.Component {
       // Bind the data to the SVG and create one path per GeoJSON feature
 
       const svgElement = d3.select(this.svg.current)
-      svgElement.append("g").attr("id", "statepath")
+      const g = svgElement.append("g").attr("id", "statepath")
       svgElement.select("#statepath").selectAll("path").remove()
+      svgElement.selectAll("#facilitydot").remove()
+
+
+
 
       svgElement.select("#statepath").selectAll("path")
         .data(json.features)
@@ -1382,7 +1457,26 @@ class DotMapViewCombine extends React.Component {
 
         })
 
-      this.sspan.innerText = this.fnameDict[parseInt(this.FACID)][0] + ',' + this.fnameDict[parseInt(this.FACID)][1] + 'Facility ' 
+      const zoom = d3.zoom()
+        .scaleExtent([1, 8])
+        .on('zoom', (event) => {
+          svgElement.select("#statepath")
+            .selectAll('path') // To prevent stroke width from scaling
+            .attr('transform', event.transform);
+          svgElement.selectAll("circle")
+            .attr('transform', event.transform);
+            svgElement
+          .selectAll("line")
+          .attr('transform', event.transform);
+          svgElement
+          .selectAll("text")
+          .attr('transform', event.transform);
+        });
+
+      svgElement.call(zoom);
+
+      this.ltitle.innerText = "Statewide deaths associated with emissions from " + this.fnameDict[parseInt(this.FACID)][0] + ', ' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
+      // this.fnameDict[parseInt(this.FACID)][0] + ',' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
 
       // + this.FACID.toString() 
 
@@ -1400,17 +1494,17 @@ class DotMapViewCombine extends React.Component {
       var uniFilterData = [...new Map(data.map(item =>
         [item['FacID'], item])).values()]
 
-        uniFilterData.sort(function (a, b) {
+      uniFilterData.sort(function (a, b) {
         return parseFloat(b["deaths_coef_2_all"]) - parseFloat(a["deaths_coef_2_all"]);
       });
       var rratio = 800
-      var rMaxSize = uniFilterData[0].deaths_coef_2_all / rratio
+      var rMaxSize = uniFilterData[0].deaths_coef_2_all
 
       svgElement.selectAll("circle")
         .data(uniFilterData)
         .enter()
         .append("circle")
-        .attr('class','facilitydot')
+        .attr('class', 'facilitydot')
         .attr("cx", function (d) {
           return self.projection([d.lon, d.lat])[0];
         })
@@ -1428,14 +1522,27 @@ class DotMapViewCombine extends React.Component {
             return "rgb(217,91,67)"
           }
         })
-        .style("opacity", ()=> this.dotcheckbox.current.checked ? 0.85: 0)
+        .style("opacity", (d) => {
+          if (parseInt(d["FacID"]) === this.FACID) {
+            return 0.85
+          } else {
+            return this.dotcheckbox.current.checked ? 0.2 : 0
+          }
+          })
         .on("mouseover", (event, d) => {
-          this.dottooltip.transition()
+          if(this.dotcheckbox.current.checked){
+            this.dottooltip.transition()
             .duration(200)
             .style("opacity", .9);
-          this.dottooltip.text(d.deaths_coef_2_all)
+            this.dottooltip.text("Total deaths by " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 )
             .style("left", (event.pageX) + "px")
             .style("top", (event.pageY - 28) + "px");
+          }else{
+            this.dottooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+          }
+          
         })
         // fade out tooltip on mouse out               
         .on("mouseout", (d) => {
@@ -1456,8 +1563,9 @@ class DotMapViewCombine extends React.Component {
           self.FACID = parseInt(d.target.__data__.FacID)
 
           self.statecode = null
-          d3.selectAll("circle").style("opacity", ()=> self.dotcheckbox.current.checked ? 0.2: 0).style("fill", "rgb(217,91,67)")
+          d3.selectAll("circle").style("opacity", () => self.dotcheckbox.current.checked ? 0.2 : 0).style("fill", "rgb(217,91,67)")
           d3.select(this).style("fill", "#abd9e9").style("opacity", .85)
+          // zoom.scale(1)
           // self.facilityLine(self.FACID)
           // self.props.setFACID(parseInt(d.target.__data__.FacID))
           self.deathGeoJson()
@@ -1488,50 +1596,52 @@ class DotMapViewCombine extends React.Component {
 
       // The scale you use for bubble size
 
-      var rsize = d3.scaleSqrt()
-        .domain([0, rMaxSize])  // What's in the data, let's say it is percentage
-        .range([0, rMaxSize])  // Size in pixel
+      // var rsize = d3.scaleSqrt()
+      //   .domain([0, rMaxSize])  // What's in the data, let's say it is percentage
+      //   .range([0, rMaxSize])  // Size in pixel
 
       // Add legend: circles
-      var valuesToShow = [parseInt(rMaxSize), parseInt(2 * rMaxSize / 3), parseInt(rMaxSize / 3)]
-      var xCircle = 780
-      var xLabel = 810
-      var yCircle = 350
-      svgElement
-        .selectAll("clegend")
-        .data(valuesToShow)
-        .enter()
-        .append("circle")
-        .attr("cx", xCircle)
-        .attr("cy", function (d) { return yCircle - rsize(d) })
-        .attr("r", function (d) { return rsize(d) })
-        .style("fill", "rgb(217,91,67)")
-        .attr("stroke", "black")
+      // var valuesToShow = [15000, 10000, 5000]
+      // var xCircle = 780
+      // var xLabel = 810
+      // var yCircle = 350
+      // svgElement
+      //   .selectAll("clegend")
+      //   .data(valuesToShow)
+      //   .enter()
+      //   .append("circle")
+      //   .attr("cx", xCircle)
+      //   .attr("cy", function (d) { return yCircle - d/rratio })
+      //   .attr("r", function (d) { return d/rratio })
+      //   .style("fill", "rgb(217,91,67)")
+      //   .attr("stroke", "black")
 
-      // Add legend: segments
-      svgElement
-        .selectAll("clegend")
-        .data(valuesToShow)
-        .enter()
-        .append("line")
-        .attr('x1', function (d) { return xCircle })
-        .attr('x2', xLabel)
-        .attr('y1', function (d) { return yCircle - 2 * rsize(d) })
-        .attr('y2', function (d) { return yCircle - 2 * rsize(d) })
-        .attr('stroke', 'black')
-        .style('stroke-dasharray', ('2,2'))
+      // // Add legend: segments
+      // svgElement
+      //   .selectAll("clegend")
+      //   .data(valuesToShow)
+      //   .enter()
+      //   .append("line")
+      //   .attr('x1', function (d) { return xCircle })
+      //   .attr("class", 'clegend_line')
+      //   .attr('x2', xLabel)
+      //   .attr('y1', function (d) { return yCircle - 2 * d/rratio })
+      //   .attr('y2', function (d) { return yCircle - 2 * d/rratio })
+      //   .attr('stroke', 'black')
+      //   .style('stroke-dasharray', ('2,2'))
 
-      // Add legend: labels
-      svgElement
-        .selectAll("clegend")
-        .data(valuesToShow)
-        .enter()
-        .append("text")
-        .attr('x', xLabel)
-        .attr('y', function (d) { return yCircle - 2 * rsize(d) })
-        .text(function (d) { return d * rratio })
-        .style("font-size", 10)
-        .attr('alignment-baseline', 'middle')
+      // // Add legend: labels
+      // svgElement
+      //   .selectAll("clegend")
+      //   .data(valuesToShow)
+      //   .enter()
+      //   .append("text")
+      //   .attr("class", 'clegend_text')
+      //   .attr('x', xLabel)
+      //   .attr('y', function (d) { return yCircle - 2 * d/rratio })
+      //   .text(function (d) { return d  })
+      //   .style("font-size", 10)
+      //   .attr('alignment-baseline', 'middle')
 
 
 
@@ -1545,8 +1655,632 @@ class DotMapViewCombine extends React.Component {
 
   }
 
-  landingview(){
-    
+  landingview() {
+
+    $('#loading-image').show();
+
+
+    d3.csv(landingstate).then((data) => {
+      var self = this;
+
+
+
+
+
+
+
+
+
+
+      const minco = d3.min(data, d => parseFloat(d.deaths_coef_2_all))
+      const maxco = d3.max(data, d => parseFloat(d.deaths_coef_2_all))
+
+      this.color.domain([0, maxco]); // setting the range of the input data    
+
+      var stringified = JSON.stringify(statejson);
+      var json = JSON.parse(stringified);
+
+      // Load GeoJSON data and merge with states data
+      for (var i = 0; i < data.length; i++) {
+
+        // Grab State Name
+        var dataState = data[i].state_zip;
+
+        // Grab data value 
+        var dataValue = data[i].deaths_coef_2_all;
+
+        // Find the corresponding state inside the GeoJSON
+        for (var j = 0; j < json.features.length; j++) {
+          var jsonState = json.features[j].properties.NAME;
+
+          if (dataState == jsonState) {
+
+            // Copy the data value into the JSON
+            json.features[j].properties.deaths_coef_2 = dataValue;
+
+            // Stop looking through the JSON
+            break;
+          }
+        }
+      }
+
+
+      // Bind the data to the SVG and create one path per GeoJSON feature
+
+      const svgElement = d3.select(this.svg.current)
+      const g = svgElement.append("g").attr("id", "statepath")
+      svgElement.select("#statepath").selectAll("path").remove()
+
+
+
+
+
+      svgElement.select("#statepath").selectAll("path")
+        .data(json.features)
+        .enter()
+        .append("path")
+        .attr("d", this.path)
+        .style("stroke", (d) => {
+          if (d.properties.NAME === this.statecode) {
+            return "rgb(100,100,100)"
+          } else {
+            return "#fff"
+          }
+
+        })
+        .style("stroke-width", (d) => {
+          if (d.properties.NAME === this.statecode) {
+            return "4"
+          } else {
+            return "1"
+          }
+        })
+        .style("fill-opacity", "0.7")
+        .style("fill", (d) => {
+
+          // Get data value
+          var value = d.properties.deaths_coef_2;
+
+          if (value) {
+            //If value exists…
+            return this.color(parseFloat(value));
+          } else {
+            //If value is undefined…
+            return "rgb(213,222,217)";
+          }
+        })
+        .on("click", (d) => {
+          // this.props.setstatecode(d.target.__data__.properties.NAME)
+          // this.statecode = d.target.__data__.properties.NAME
+          // this.deathGeoJson()
+          // this.updateLegend()
+
+        })
+
+      const zoom = d3.zoom()
+        .scaleExtent([1, 8])
+        .on('zoom', (event) => {
+          svgElement.select("#statepath")
+            .selectAll('path') // To prevent stroke width from scaling
+            .attr('transform', event.transform);
+          svgElement.selectAll("circle")
+            .attr('transform', event.transform);
+          svgElement
+          .selectAll("line")
+          .attr('transform', event.transform);
+          svgElement
+          .selectAll("text")
+          .attr('transform', event.transform);
+        });
+
+      svgElement.call(zoom);
+
+      this.ltitle.innerText = 'The overall statewide deaths'
+
+      this.mtitle.innerText = ''
+
+
+      // + this.FACID.toString() 
+
+      // svgElement.append("text")
+      // .attr("x", '60vw' )
+      // .attr("y", '40vh')
+      // .attr("dy", ".35em")
+      // .style('font-size', '50px')
+      // .text((d) =>{ return 'Death in ' + this.statecode + 'caused by other states.'; });
+
+
+      d3.csv(statedata).then((circledata) => {
+
+        var uniFilterData = [...new Map(circledata.map(item =>
+          [item['FacID'], item])).values()]
+
+        uniFilterData.sort(function (a, b) {
+          return parseFloat(b["deaths_coef_2_all"]) - parseFloat(a["deaths_coef_2_all"]);
+        });
+        var rratio = 800
+        var rMaxSize = uniFilterData[0].deaths_coef_2_all
+
+        svgElement.selectAll("circle")
+          .data(uniFilterData)
+          .enter()
+          .append("circle")
+          .attr('class', 'facilitydot')
+          .attr("cx", function (d) {
+            return self.projection([d.lon, d.lat])[0];
+          })
+          .attr("cy", function (d) {
+            return self.projection([d.lon, d.lat])[1];
+          })
+          .attr("r", function (d) {
+            return d.deaths_coef_2_all / rratio;
+          })
+          .style("stroke", "gray")
+          .style("fill", d => {
+            if (parseInt(d["FacID"]) === this.FACID) {
+              return "#abd9e9"
+            } else {
+              return "rgb(217,91,67)"
+            }
+          })
+          .style("opacity", () => this.dotcheckbox.current.checked ? 0.85 : 0)
+          .on("mouseover", (event, d) => {
+            this.dottooltip.transition()
+              .duration(200)
+              .style("opacity", .9);
+          this.dottooltip.text("Total deaths by " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 )
+              .style("left", (event.pageX) + "px")
+              .style("top", (event.pageY - 28) + "px");
+            
+          })
+          // fade out tooltip on mouse out               
+          .on("mouseout", (d) => {
+            this.dottooltip.transition()
+              .duration(500)
+              .style("opacity", 0);
+          })
+
+          // Modification of custom tooltip code provided by Malcolm Maclean, "D3 Tips and Tricks" 
+          // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
+          .on("click", function (d) {
+            //remove target map 
+            const targetsvgElement = d3.select(self.targetsvg)
+            // targetsvgElement.append("g").attr("id", "tstatepath")
+            targetsvgElement.select("#tstatepath").selectAll("path").remove()
+            self.mtitle.innerText = ''
+
+            self.FACID = parseInt(d.target.__data__.FacID)
+
+            self.statecode = null
+            d3.selectAll("circle").style("opacity", () => self.dotcheckbox.current.checked ? 0.2 : 0).style("fill", "rgb(217,91,67)")
+            d3.select(this).style("fill", "#abd9e9").style("opacity", .85)
+            // zoom.scale(1)
+            // self.facilityLine(self.FACID)
+            // self.props.setFACID(parseInt(d.target.__data__.FacID))
+            self.deathGeoJson()
+            self.prepMark()
+
+            // self.updateLegend()
+
+
+            //update 
+            // div.transition()        
+            //      .duration(200)      
+            //      .style("opacity", .9);      
+            //      div.text(d.place)
+            //      .style("left", (d3.event.pageX) + "px")     
+            //      .style("top", (d3.event.pageY - 28) + "px");    
+          })
+
+        // // fade out tooltip on mouse out               
+        // .on("mouseout", function (d) {
+        //   // div.transition()        
+        //   //    .duration(500)      
+        //   //    .style("opacity", 0);   
+        // });
+
+
+        //////////////////////read ftostate data
+
+
+        // The scale you use for bubble size
+
+        // var rsize = d3.scaleSqrt()
+        //   .domain([0, rMaxSize])  // What's in the data, let's say it is percentage
+        //   .range([0, rMaxSize])  // Size in pixel
+
+        // Add legend: circles
+        var valuesToShow = [15000, 10000, 5000]
+        var xCircle = 780
+        var xLabel = 810
+        var yCircle = 350
+        svgElement
+          .selectAll("clegend")
+          .data(valuesToShow)
+          .enter()
+          .append("circle")
+          .attr("cx", xCircle)
+          .attr("cy", function (d) { return yCircle - d / rratio })
+          .attr("r", function (d) { return d / rratio })
+          .style("fill", "rgb(217,91,67)")
+          .attr("stroke", "black")
+
+        // Add legend: segments
+        svgElement
+          .selectAll("clegend")
+          .data(valuesToShow)
+          .enter()
+          .append("line")
+          .attr('x1', function (d) { return xCircle })
+          .attr("class", 'clegend_line')
+          .attr('x2', xLabel)
+          .attr('y1', function (d) { return yCircle - 2 * d / rratio })
+          .attr('y2', function (d) { return yCircle - 2 * d / rratio })
+          .attr('stroke', 'black')
+          .style('stroke-dasharray', ('2,2'))
+
+        // Add legend: labels
+        svgElement
+          .selectAll("clegend")
+          .data(valuesToShow)
+          .enter()
+          .append("text")
+          .attr("class", 'clegend_text')
+          .attr('x', xLabel)
+          .attr('y', function (d) { return yCircle - 2 * d / rratio })
+          .text(function (d) { return d })
+          .style("font-size", 10)
+          .attr('alignment-baseline', 'middle')
+
+        svgElement
+          .selectAll("clegend")
+          .data(['Facility Deaths '])
+          .enter()
+          .append("text")
+          .attr("class", 'clegend_text')
+          .attr('x', xLabel - 50)
+          .attr('y', yCircle - 70)
+          .text(function (d) { return d })
+          .style("font-size", 10)
+          .attr('alignment-baseline', 'middle')
+
+
+      })
+
+
+
+
+
+
+
+
+      this.updateLegend(this.color)
+
+
+
+    });
+
+    d3.csv(landingstack).then((data) => {
+
+
+
+
+      // //filter data
+      // var filteredData = data.filter((d) => {
+
+      //   if ((d["state_facility"] == this.statecode)) {
+      //     return d;
+      //   }
+
+      // })
+
+
+
+      const minco = parseFloat(d3.min(data, d => parseFloat(d.deaths_coef_2_all))) - 0.1
+      const maxco = parseFloat(d3.max(data, d => parseFloat(d.deaths_coef_2_all))) + 0.1
+
+      this.color.domain([0, maxco]); // setting the range of the input data 
+
+      // extract series data:
+      const statenames = data.map(d => {
+        return d.state_zip
+      })
+
+      function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
+      }
+
+      const unistate = statenames.filter(onlyUnique)
+
+      var seriesdata = []
+
+      unistate.forEach((state) => {
+        var stateto = data.filter((d) => {
+
+          if ((d["state_zip"] == state)) {
+            return d;
+          }
+
+        })
+
+        stateto.sort(function (first, second) {
+          return parseInt(first.year) - parseInt(second.year);
+        });
+
+        var yearstateto = stateto.map((d) => {
+          return parseFloat(d.deaths_coef_2_all)
+        })
+
+        seriesdata.push({
+
+          name: state,
+          type: 'line',
+          stack: 'Total',
+          areaStyle: {},
+
+          itemStyle: {
+            color: this.color(parseFloat(yearstateto[0]))  //change later
+          },
+          data: yearstateto,
+          sum: d3.sum(yearstateto)
+
+
+        })
+
+
+
+
+      })
+      // console.log(seriesdata)
+      seriesdata.sort(function (first, second) {
+        return parseFloat(second.sum) - parseFloat(first.sum);
+      });
+
+      var legenddata = seriesdata.map((d) => {
+        return d.name
+      })
+
+      // if (seriesdata.length > 0) {
+      //   seriesdata[0].markPoint = markDict
+      // }
+
+
+
+      this.lineoption = {
+
+        // tooltip: {
+        //   trigger: 'axis',
+        //   // textStyle:{fontSize : 5},
+        //   // formatter: (params)=>{
+        //   //   return params.sum
+        //   // },
+        //   padding: 2,
+        //   position: [10, 10],
+        //   axisPointer: {
+        //     type: 'none',
+        //     label: {
+        //       backgroundColor: '#6a7985'
+        //     }
+        //   }
+        // },
+        // title: {
+        //   text: 'Statewide deaths associated with emissions from ' + this.statecode,
+        //   left: 'left'
+        // },
+        legend: {
+          orient: 'vertical',
+          left: 'right',
+          type: 'scroll',//does not work
+          height: 300,
+          formatter: name => {
+            var series = this.myChart.getOption().series;
+            var value = series.filter(row => row.name === name)[0].sum
+            if (value > 10) {
+              return name + '    ' + Math.ceil(value / 10) * 10;
+            } else {
+              return name + '    <10';
+            }
+          },
+          data: legenddata
+        },
+
+        // tooltip: {
+        //   trigger: 'axis',
+        //   axisPointer: {
+
+        //     label: {
+        //       backgroundColor: '#6a7985'
+        //     }
+        //   }
+        // },
+        // legend: {
+        //   data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+        // },
+
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '15%',
+          containLabel: true
+        },
+        xAxis: [
+          {
+            type: 'category',
+            // axisLabel:{interval:0,
+            //   // fontSize: 
+            // }  ,
+            // axisPointer: {
+            //   value: this.props.year,
+            //   snap: true,
+            //   lineStyle: {
+            //     color: 'rgb(100,100,100)',
+            //     width: 3
+            //   },
+            //   label: {
+            //     show: false,
+            //     formatter: (params) => {
+            //       console.log(params.value)
+            //       if (params.value !== this.year) {
+            //         // ...
+            //         this.year = params.value
+            //         // this.props.setyear(params.value)
+            //         //...
+            //       }
+            //       return null;
+            //     }
+
+            //   },
+            //   handle: {
+            //     show: false,
+            //     color: 'rgb(100,100,100)',
+            //     size: 20,
+            //   }
+            // },
+            boundaryGap: false,
+            data: d3.range(1999, 2021, 1)
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            max: this.checkbox.current.checked ? 70000 : null
+          }
+        ],
+        series: seriesdata
+
+      };
+
+
+      // var chartDom = document.getElementById('linestack');
+      // var myChart = echarts.init(chartDom);
+      // myChart.setOption(this.lineoption);
+
+      // var chartDom = document.getElementById('linestack2');
+
+      this.myChart.setOption(this.lineoption, {
+        notMerge: true
+
+      });
+
+      this.myChart.getZr().on('mouseover', (params) => {
+        // set a small delay before continuing to ensure that series highlight/emphasis-state has already taken effect within Echarts. A single tick is not enough.
+        // let zrTimeout = setTimeout(() => {
+
+
+        // get the polyline/polygon drawing element from the ZRender component which is servicing a series and is in emphasis/highlight state
+        const seriesPolyShape = this.myChart.getZr().storage._displayList.find(d => d.currentStates[0] === "emphasis" && d.parent?.parent?.__ecComponentInfo?.mainType === "series")
+
+        // get the series index
+
+
+        var highlightedSeriesIndex
+        Object.values(params.target).forEach(val => {
+          if (typeof (val) === 'object' && (typeof (val['seriesIndex']) !== "undefined")) {
+            highlightedSeriesIndex = val['seriesIndex']
+            return
+          }
+        });
+        // seriesPolyShape?.parent?.parent?.__ecComponentInfo?.index
+        // params.target.__ec_inner_7.seriesIndex
+
+        if ((typeof (highlightedSeriesIndex) === "undefined")) {
+          this.dottooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+
+          const svgElement = d3.select(this.svg.current)
+
+          svgElement.select("#statepath").selectAll("path")
+            .style("stroke",
+              "#fff"
+
+
+            )
+            .style("stroke-width",
+              "1"
+
+            )
+          return
+
+
+        } else {
+
+          this.lastserieshover = highlightedSeriesIndex
+
+          var series = this.myChart.getOption().series;
+          var sumvalue = series[highlightedSeriesIndex].sum
+          var statename = series[highlightedSeriesIndex].name
+
+
+          // tooltip 
+          const pointInPixel = [params.offsetX, params.offsetY];
+          const pointInGrid = this.myChart.convertFromPixel('grid', pointInPixel);
+          this.dottooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
+          this.dottooltip.text("Causes around " + Math.ceil(sumvalue / 10) * 10 + " deaths in " + statename)
+            .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw')
+            .style("top", (params.offsetY+50) + "px");
+
+          const svgElement = d3.select(this.svg.current)
+
+          svgElement.select("#statepath").selectAll("path")
+            .style("stroke", (d, i) => {
+              if (d.properties.NAME === statename) {
+                console.log(statename)
+                console.log(d.properties.NAME)
+                return "rgb(100,100,100)"
+              } else {
+                return "#fff"
+              }
+
+            })
+            .style("stroke-width", (d) => {
+              if (d.properties.NAME === statename) {
+                return "4"
+              } else {
+                return "1"
+              }
+            })
+
+        }
+
+
+
+        // }, 5)
+
+
+
+      })
+
+      this.myChart.getZr().on('mouseout', (params) => {
+        this.dottooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+
+        const svgElement = d3.select(this.svg.current)
+
+        svgElement.select("#statepath").selectAll("path")
+          .style("stroke",
+            "#fff"
+
+
+          )
+          .style("stroke-width",
+            "1"
+
+          )
+      })
+
+
+
+      this.ltitle.innerText = 'The overall statewide deaths'
+      $('#loading-image').hide();
+    })
+
+
+
+
   }
 
 
@@ -1609,6 +2343,17 @@ class DotMapViewCombine extends React.Component {
       .attr("class", "axis")
       .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")")
       .call(legendaxis);
+
+    // svg
+    // .selectAll("legend2_title")
+    // .data(['Statewide Death Coefficient'])
+    // .enter()
+    // .append("text")
+    // // .attr("class", 'legend_text')
+    // .attr("transform", "translate(" + margin.left + "," + (margin.top ) + ")")
+    // .text(function (d) { return d  })
+    // .style("font-size", 10)
+    // .attr('alignment-baseline', 'middle')
   }
 
   facilityLine(FACID) {
@@ -1727,6 +2472,14 @@ class DotMapViewCombine extends React.Component {
 
   }
 
+  openNav() {
+    document.getElementById("mySidepanel").style.width = "250px";
+  }
+
+  closeNav() {
+    document.getElementById("mySidepanel").style.width = "0";
+  }
+
   render() {
     // const {year, statecode} = this.state;
     // this.deathGeoJson()
@@ -1740,6 +2493,8 @@ class DotMapViewCombine extends React.Component {
 
     var facidstr = JSON.stringify(facIDname);
     var facidjson = JSON.parse(facidstr);
+    facidjson.sort((a, b) => (a.label > b.label) ? 1 : -1)
+
     // var filterfacidjson = facidjson.filter((d) => {
 
     //   if(d.value[0] === 'Alabama') {
@@ -1763,19 +2518,26 @@ class DotMapViewCombine extends React.Component {
     return (
 
       <div>
+        <h1 style={{ transform: "translate(38vw,0)" }}> CPIE: A Carbon Counter Tool </h1>
+        <div className="centered">
+        <h2 className="specific_title" style={{ visibility: "visible", marginTop:'0px'}} ref={input => (this.ltitle = input)}></h2>
+      </div>
+
         <div class="column" >
 
           <div
             style={{ width: '50vw', }}>
-            {this.FACID ? <h1>Deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.sspan = input)}>{this.fname + 'Facility ' }</span> </h1>
-              : <h1>Deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.sspan = input)}>{this.statecode}</span> state </h1>
-            }
-            <div style={{ width: '300px', height: '30px', position: 'absolute', top: '10vh', left: '18vw' }}>
+            {/* <h2 className="specific_title" style={{ visibility: "visible" }} ref={input => (this.sspan = input)}> The overall statewide deaths </h2> */}
+
+
+
+
+            <div style={{ width: '150px', height: '20px', position: 'absolute', top: '15vh', left: '35vw' }}>
               <Select
                 // noOptionsMessage={() => 'Select a state to show...'}
                 // LoadingMessage = {()=> 'Select a state to show...'}
 
-                placeholder='Select a state to show...'
+                placeholder='Explore by state'
                 value={this.statecode}
                 onChange={this.handleChange}
                 options={this.selectoptions}
@@ -1784,16 +2546,19 @@ class DotMapViewCombine extends React.Component {
             </div>
 
             {
+              <div style={{ width: '150px', height: '20px', position: 'absolute', top: '15vh', left: '50vw' }}>
 
-              <Select
-                placeholder='Select a facility to show...'
-                value={this.FACID}
-                onChange={this.FACIDhandleChange}
-                options={facidjson}
-                ref={input => (this.selectref = input)}
-              />}
+                <Select
+                  placeholder='Explore by facility'
+                  value={this.FACID}
+                  onChange={this.FACIDhandleChange}
+                  options={facidjson}
+                  ref={input => (this.selectref = input)}
+                />
 
-            <div style={{ position: "relative", float: "left", left: "40vw" }}>
+              </div>}
+
+            <div style={{ position: "relative", float: "left", left: "2vw", zIndex: 10000 }}>
               <span style={{ color: '#f1aca5', position: 'relative', top: '5px', right: '10px', fontSize: '15px' }}>show facilities</span>
               <label class="switch" >
                 <input type="checkbox" onChange={this.dottoggle} defaultChecked={true} ref={this.dotcheckbox} />
@@ -1805,7 +2570,7 @@ class DotMapViewCombine extends React.Component {
               // height={this.height}
               className="dotmapview"
               viewBox="0 0 1000 500"
-              style={{ position: 'absolute', top: '15vh', left: '2vw', width: '50vw', height: 'auto' }}
+              style={{ position: 'absolute', top: '18vh', left: '2vw', width: '50vw', height: 'auto' }}
 
               ref={this.svg}
             // ref = {ref}
@@ -1831,6 +2596,33 @@ class DotMapViewCombine extends React.Component {
 
 
             </svg>
+
+            <div id="mySidepanel" className="sidepanel">
+              <a href="javascript:void(0)" className="closebtn" onClick={this.closeNav}>×</a>
+              <p >Authors</p>
+
+              <a href="#">Lucas Henneman, George Mason University</a>
+              <a href="#">Christine Choirat, ETH Zürich and EPFL</a>
+              <a href="#">Irene Dedoussi, TU Delft</a>
+              <a href="#">Francesca Dmonici, Harvard TH Chan School of Public Health</a>
+              <a href="#">Jessica Roberts, Georgia Institute of Technology</a>
+              <a href="#">Corwin Ziger, University of Texas, Austin</a>
+
+              <p >Data and methods</p>
+              <p style={{fontSize: '10px'}}> Facility information is taken from EPA’s Clean Air Markets Program Data (https://campd.epa.gov/) .
+                Population exposure is derived from each facility’s sulfur dioxide (SO2) emissions, atmospheric transport and dispersion, and chemical conversion to fine particulate matter (PM2.5). Other exposures and impacts (e.g., climate impacts) are not considered.
+                Deaths correspond to premature mortalities in the US Medicare population.
+                More detail on the methods is available here:
+                Lucas Henneman, Christine Choirat, Irene Dedoussi, Francesca Dominici, Jessica Roberts, Corwin Zigler. Coal’s toll: 22 years of Medicare deaths attributable to electricity generation. Under review.
+              </p>
+              <p>Development</p>
+              <a href="https://sichenj.in/">Sichen Jin, Georgia Institute of Technology</a>
+
+
+            </div>
+
+            <button className="openbtn" onClick={this.openNav} style={{ position: 'absolute', top: '10px', right: '5px', }}>☰ Project Info</button>
+
             <div id="facilityline" style={{ width: '50vw', height: '20vh', display: 'block' }} >
 
 
@@ -1854,14 +2646,16 @@ class DotMapViewCombine extends React.Component {
           {/* <MapView year = {this.year} statecode = {this.statecode} setyear={year => this.setyear(year)} setstatecode={statecode => this.setstatecode(statecode)}/> */}
 
         </div>
-        <div id="legend2" style={{ display: 'inline-block', position: 'absolute', top: '55vh', left: '40vw' }} ></div>
+        <div>          <span style={{ color: 'black', position: 'absolute', top: '54vh', left: '38vw', fontSize: '10px' }}> Statewide Deaths </span>
+        </div>
+        <div id="legend2" style={{ display: 'inline-block', position: 'absolute', top: '55vh', left: '40vw' }} >
+        </div>
 
         <div class="column"  >
 
-          {this.FACID ? <h1>Statewide deaths associated with emissions from <span style={{ color: '#db4e3e' }} ref={input => (this.ltitle = input)}>{this.fname +'Facility ' }</span> </h1>
-            : <h1>Statewide deaths associated with emissions from  <span style={{ color: '#db4e3e' }} ref={input => (this.ltitle = input)}>{this.statecode}</span>  </h1>
-          }
-          <div key={this.FACID} style={{ width: 'auto', height: '95vh', display: 'block' }} ref={this.div}>
+
+
+          <div key={this.FACID} style={{ width: 'auto', height: '90vh', display: 'block' }} ref={this.div}>
             <div style={{ position: "relative", float: "left", left: "36vw" }}>
               <span style={{ color: '#f1aca5', position: 'relative', top: '5px', right: '10px', fontSize: '15px' }}>consistent scale</span>
               <label class="switch" >
