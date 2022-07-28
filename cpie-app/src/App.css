@@ -186,7 +186,17 @@ input:checked + .slider:before {
   padding-top: 50px;
 }
 
-.sidepanel a {
+.sidepanel a.insidea {
+  padding: 0px 0px 0px 0px;
+  text-decoration: none;
+  font-size: 10px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+  margin-bottom: 0px;
+}
+
+.sidepanel a  {
   padding: 8px 8px 8px 32px;
   text-decoration: none;
   font-size: 10px;
@@ -200,6 +210,16 @@ input:checked + .slider:before {
   padding: 8px 8px 8px 32px;
   text-decoration: none;
   font-size: 15px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+.sidepanel p.insidep {
+  padding: 0px 8px 5px 32px;
+  text-decoration: none;
+  font-size: 10px;
   color: #818181;
   display: block;
   transition: 0.3s;

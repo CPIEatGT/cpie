@@ -75,6 +75,7 @@ class DotMapViewCombine extends React.Component {
     this.div = React.createRef();
     this.checkbox = React.createRef();
     this.dotcheckbox = React.createRef();
+    this.legendcheckbox = React.createRef();
     this.color = d3.scaleSequential(interpolateOrRd)
     this.dottooltip = d3.select("body")
       .append("div")
@@ -126,6 +127,7 @@ class DotMapViewCombine extends React.Component {
     this.FACID = null
     this.fname = null
     this.dotcheckbox.current.checked = false
+    this.legendcheckbox.current.checked = false
     this.props.setstatecode(selectedOption.value)
     this.statecode = selectedOption.value
 
@@ -177,6 +179,7 @@ class DotMapViewCombine extends React.Component {
     // this.stackLine({data:[]})
     // // this.checkbox.current.checked = !this.checkbox.current.checked 
     const targetsvgElement = d3.select(this.targetsvg)
+    this.legendcheckbox.current.checked = false
     // targetsvgElement.append("g").attr("id", "tstatepath")
     targetsvgElement.select("#tstatepath").selectAll("path").remove()
     this.mtitle.innerText = ''
@@ -281,6 +284,19 @@ class DotMapViewCombine extends React.Component {
 
 
     // console.log(event.target.checked)
+  }
+
+  legendtoggle = event=>{
+    if (event.target.checked) {
+      // unselect all 
+      this.myChart.dispatchAction({ type: 'legendAllSelect' })
+      this.myChart.dispatchAction({ type: 'legendInverseSelect' })
+      
+    }else{
+      //selectall 
+
+      this.myChart.dispatchAction({ type: 'legendAllSelect' })
+    }
   }
 
   dottoggle = event => {
@@ -521,8 +537,9 @@ class DotMapViewCombine extends React.Component {
           seriesdata[0].markPoint = markDict[0]
         }
 
-
-
+        var totalDeath = d3.sum(seriesdata.map((d) => {
+          return parseFloat(d.sum)
+        }))
 
 
 
@@ -548,7 +565,9 @@ class DotMapViewCombine extends React.Component {
           //   left: 'left'
           // },
 
-          title: {
+          
+
+          title:[ {
             text: markDict[1].sum > 1 ? 'Records for ' + markDict[1].sum.toString() + ' units' : 'Records for ' + markDict[1].sum.toString() + ' unit',
 
 
@@ -559,7 +578,21 @@ class DotMapViewCombine extends React.Component {
             },
             right: '5%',
             top: '57%'
+          },{
+          text:Math.ceil( totalDeath / 10) * 10 + ' Deaths',
+
+
+          textStyle: {
+            fontWeight: 'normal',
+            fontSize: 10,
+            lineHeight: 20
           },
+          right: '5%',
+          top: '55%'
+        }
+        ],
+         
+          
           legend: {
             orient: 'vertical',
             left: 'right',
@@ -713,7 +746,8 @@ class DotMapViewCombine extends React.Component {
             this.dottooltip.transition()
               .duration(200)
               .style("opacity", .9);
-            this.dottooltip.text("Causes around " + Math.ceil(sumvalue / 10) * 10 + " deaths in " + statename)
+            this.dottooltip.text('Associated with ' + Math.ceil(sumvalue / 10) * 10 +   ' deaths in ' + statename
+            )
               .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw')
               .style("top", (params.offsetY+50) + "px");
 
@@ -767,7 +801,7 @@ class DotMapViewCombine extends React.Component {
             )
         })
 
-        this.ltitle.innerText = 'Statewide deaths associated with emissions from ' + this.fnameDict[parseInt(this.FACID)][0] + ', ' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
+        this.ltitle.innerText = 'Statewide deaths associated with '+  this.fnameDict[parseInt(this.FACID)][0]+ ' (' + this.fnameDict[parseInt(this.FACID)][1] + ') Facility'
 
         // `Statewide deaths associated with emissions from <span style={{ color: '#db4e3e' }} >`+ this.fnameDict[parseInt(this.FACID)][0] + ',' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility ' + `</span> `
 
@@ -861,6 +895,9 @@ class DotMapViewCombine extends React.Component {
         if (seriesdata.length > 0) {
           seriesdata[0].markPoint = markDict
         }
+        var totalDeath = d3.sum(seriesdata.map((d) => {
+          return parseFloat(d.sum)
+        }))
 
 
 
@@ -881,10 +918,18 @@ class DotMapViewCombine extends React.Component {
           //     }
           //   }
           // },
-          // title: {
-          //   text: 'Statewide deaths associated with emissions from ' + this.statecode,
-          //   left: 'left'
-          // },
+          title: {
+            text:Math.ceil( totalDeath / 10) * 10 + ' Deaths',
+  
+  
+            textStyle: {
+              fontWeight: 'normal',
+              fontSize: 10,
+              lineHeight: 20
+            },
+            right: '5%',
+            top: '75%'
+          },
           legend: {
             orient: 'vertical',
             left: 'right',
@@ -1069,7 +1114,8 @@ class DotMapViewCombine extends React.Component {
 
         // })
 
-        this.ltitle.innerText = 'Statewide deaths associated with emissions from ' + this.statecode
+        this.ltitle.innerText = 'Statewide deaths associated with all facilities in ' +   this.statecode
+        // 'Statewide deaths associated with emissions from ' + this.statecode
 
         // this.statecode
         $('#loading-image').hide();
@@ -1308,7 +1354,8 @@ class DotMapViewCombine extends React.Component {
       //   .style("left",  "10vw")
       //   .text((d) => { return  this.statecode + ' deaths attributable to facilities in other states'; });
 
-      this.ltitle.innerText = "Statewide deaths associated with emissions from " + this.statecode
+      this.ltitle.innerText = 'Statewide deaths associated with all facilities in ' +   this.statecode
+      // "Statewide deaths associated with emissions from " + this.statecode
       this.mtitle.innerText = this.statecode + ' deaths attributable to facilities in other states'
 
 
@@ -1410,7 +1457,7 @@ class DotMapViewCombine extends React.Component {
       const svgElement = d3.select(this.svg.current)
       const g = svgElement.append("g").attr("id", "statepath")
       svgElement.select("#statepath").selectAll("path").remove()
-      svgElement.selectAll("#facilitydot").remove()
+      svgElement.selectAll(".facilitydot").remove()
 
 
 
@@ -1457,25 +1504,11 @@ class DotMapViewCombine extends React.Component {
 
         })
 
-      const zoom = d3.zoom()
-        .scaleExtent([1, 8])
-        .on('zoom', (event) => {
-          svgElement.select("#statepath")
-            .selectAll('path') // To prevent stroke width from scaling
-            .attr('transform', event.transform);
-          svgElement.selectAll("circle")
-            .attr('transform', event.transform);
-            svgElement
-          .selectAll("line")
-          .attr('transform', event.transform);
-          svgElement
-          .selectAll("text")
-          .attr('transform', event.transform);
-        });
+      
 
-      svgElement.call(zoom);
+      this.ltitle.innerText = 'Statewide deaths associated with '+  this.fnameDict[parseInt(this.FACID)][0]+ ' (' + this.fnameDict[parseInt(this.FACID)][1] + ') Facility'
 
-      this.ltitle.innerText = "Statewide deaths associated with emissions from " + this.fnameDict[parseInt(this.FACID)][0] + ', ' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
+      // "Statewide deaths associated with emissions from " + this.fnameDict[parseInt(this.FACID)][0] + ', ' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
       // this.fnameDict[parseInt(this.FACID)][0] + ',' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
 
       // + this.FACID.toString() 
@@ -1534,7 +1567,7 @@ class DotMapViewCombine extends React.Component {
             this.dottooltip.transition()
             .duration(200)
             .style("opacity", .9);
-            this.dottooltip.text("Total deaths by " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 )
+            this.dottooltip.text("Total deaths from " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 )
             .style("left", (event.pageX) + "px")
             .style("top", (event.pageY - 28) + "px");
           }else{
@@ -1555,6 +1588,7 @@ class DotMapViewCombine extends React.Component {
         // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
         .on("click", function (d) {
           //remove target map 
+          self.legendcheckbox.current.checked = false
           const targetsvgElement = d3.select(self.targetsvg)
           // targetsvgElement.append("g").attr("id", "tstatepath")
           targetsvgElement.select("#tstatepath").selectAll("path").remove()
@@ -1582,6 +1616,24 @@ class DotMapViewCombine extends React.Component {
           //      .style("left", (d3.event.pageX) + "px")     
           //      .style("top", (d3.event.pageY - 28) + "px");    
         })
+
+        const zoom = d3.zoom()
+        .scaleExtent([1, 8])
+        .on('zoom', (event) => {
+          svgElement.select("#statepath")
+            .selectAll('path') // To prevent stroke width from scaling
+            .attr('transform', event.transform);
+          svgElement.selectAll("circle")
+            .attr('transform', event.transform);
+            svgElement
+          .selectAll("line")
+          .attr('transform', event.transform);
+          svgElement
+          .selectAll("text")
+          .attr('transform', event.transform);
+        });
+
+      svgElement.call(zoom);
 
       // // fade out tooltip on mouse out               
       // .on("mouseout", function (d) {
@@ -1828,7 +1880,7 @@ class DotMapViewCombine extends React.Component {
             this.dottooltip.transition()
               .duration(200)
               .style("opacity", .9);
-          this.dottooltip.text("Total deaths by " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 )
+          this.dottooltip.text("Total deaths from " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 )
               .style("left", (event.pageX) + "px")
               .style("top", (event.pageY - 28) + "px");
             
@@ -1844,6 +1896,7 @@ class DotMapViewCombine extends React.Component {
           // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
           .on("click", function (d) {
             //remove target map 
+            self.legendcheckbox.current.checked = false
             const targetsvgElement = d3.select(self.targetsvg)
             // targetsvgElement.append("g").attr("id", "tstatepath")
             targetsvgElement.select("#tstatepath").selectAll("path").remove()
@@ -2040,6 +2093,10 @@ class DotMapViewCombine extends React.Component {
         return d.name
       })
 
+      var totalDeath = d3.sum(seriesdata.map((d) => {
+        return parseFloat(d.sum)
+      }))
+
       // if (seriesdata.length > 0) {
       //   seriesdata[0].markPoint = markDict
       // }
@@ -2063,10 +2120,18 @@ class DotMapViewCombine extends React.Component {
         //     }
         //   }
         // },
-        // title: {
-        //   text: 'Statewide deaths associated with emissions from ' + this.statecode,
-        //   left: 'left'
-        // },
+        title: {
+          text:Math.ceil( totalDeath / 10) * 10 + ' Deaths',
+
+
+          textStyle: {
+            fontWeight: 'normal',
+            fontSize: 10,
+            lineHeight: 20
+          },
+          right: '5%',
+          top: '70%'
+        },
         legend: {
           orient: 'vertical',
           left: 'right',
@@ -2218,7 +2283,8 @@ class DotMapViewCombine extends React.Component {
           this.dottooltip.transition()
             .duration(200)
             .style("opacity", .9);
-          this.dottooltip.text("Causes around " + Math.ceil(sumvalue / 10) * 10 + " deaths in " + statename)
+          this.dottooltip.text('Associated with ' + Math.ceil(sumvalue / 10) * 10 +   ' deaths in ' + statename
+            )
             .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw')
             .style("top", (params.offsetY+50) + "px");
 
@@ -2518,7 +2584,7 @@ class DotMapViewCombine extends React.Component {
     return (
 
       <div>
-        <h1 style={{ transform: "translate(38vw,0)" }}> CPIE: A Carbon Counter Tool </h1>
+        <h1 style={{ transform: "translate(35vw,0)" }}> Coal Pollution Interactive Explorer </h1>
         <div className="centered">
         <h2 className="specific_title" style={{ visibility: "visible", marginTop:'0px'}} ref={input => (this.ltitle = input)}></h2>
       </div>
@@ -2532,7 +2598,7 @@ class DotMapViewCombine extends React.Component {
 
 
 
-            <div style={{ width: '150px', height: '20px', position: 'absolute', top: '15vh', left: '35vw' }}>
+            <div style={{ zIndex:10000,width: '150px', height: '20px', position: 'absolute', top: '12vh', left: '35vw' }}>
               <Select
                 // noOptionsMessage={() => 'Select a state to show...'}
                 // LoadingMessage = {()=> 'Select a state to show...'}
@@ -2546,7 +2612,7 @@ class DotMapViewCombine extends React.Component {
             </div>
 
             {
-              <div style={{ width: '150px', height: '20px', position: 'absolute', top: '15vh', left: '50vw' }}>
+              <div style={{ zIndex:10000, width: '150px', height: '20px', position: 'absolute', top: '12vh', left: '50vw' }}>
 
                 <Select
                   placeholder='Explore by facility'
@@ -2598,30 +2664,30 @@ class DotMapViewCombine extends React.Component {
             </svg>
 
             <div id="mySidepanel" className="sidepanel">
-              <a href="javascript:void(0)" className="closebtn" onClick={this.closeNav}>×</a>
-              <p >Authors</p>
+              <a  href="javascript:void(0)" className="closebtn" onClick={this.closeNav}>×</a>
+              <p style={{paddingTop:'0px'}}>Authors</p>
 
-              <a href="#">Lucas Henneman, George Mason University</a>
-              <a href="#">Christine Choirat, ETH Zürich and EPFL</a>
-              <a href="#">Irene Dedoussi, TU Delft</a>
-              <a href="#">Francesca Dmonici, Harvard TH Chan School of Public Health</a>
-              <a href="#">Jessica Roberts, Georgia Institute of Technology</a>
-              <a href="#">Corwin Ziger, University of Texas, Austin</a>
+              <a target="_blank" href="http://lucashennem.com/">Lucas Henneman, George Mason University</a>
+              <a  target="_blank"  href="#">Christine Choirat, ETH Zürich and EPFL</a>
+              <a target="_blank" href="#">Irene Dedoussi, TU Delft</a>
+              <a  target="_blank" href="#">Francesca Dmonici, Harvard TH Chan School of Public Health</a>
+              <a target="_blank" href="#">Jessica Roberts, Georgia Institute of Technology</a>
+              <a target="_blank" href="#">Corwin Ziger, University of Texas, Austin</a>
 
               <p >Data and methods</p>
-              <p style={{fontSize: '10px'}}> Facility information is taken from EPA’s Clean Air Markets Program Data (https://campd.epa.gov/) .
-                Population exposure is derived from each facility’s sulfur dioxide (SO2) emissions, atmospheric transport and dispersion, and chemical conversion to fine particulate matter (PM2.5). Other exposures and impacts (e.g., climate impacts) are not considered.
-                Deaths correspond to premature mortalities in the US Medicare population.
-                More detail on the methods is available here:
-                Lucas Henneman, Christine Choirat, Irene Dedoussi, Francesca Dominici, Jessica Roberts, Corwin Zigler. Coal’s toll: 22 years of Medicare deaths attributable to electricity generation. Under review.
-              </p>
+              <p className="insidep"> Facility information is taken from <a target="_blank" className="insidea" href="https://campd.epa.gov/">EPA’s Clean Air Markets Program Data </a> (https://campd.epa.gov/) .</p>
+              <p className="insidep"> Population exposure is derived from each facility’s sulfur dioxide (SO<sub>2</sub>) emissions, atmospheric transport and dispersion, and chemical conversion to fine particulate matter (PM<sub>2.5</sub>). Other exposures and impacts (e.g., climate impacts) are not considered.</p>
+              <p className="insidep"> Deaths correspond to premature mortalities in the US Medicare population.</p>
+              <p className="insidep"> More detail on the methods is available here:</p>
+              <p className="insidep"> Lucas Henneman, Christine Choirat, Irene Dedoussi, Francesca Dominici, Jessica Roberts, Corwin Zigler. Coal’s toll: 22 years of Medicare deaths attributable to electricity generation. <i>Under review</i>.</p>
+              
               <p>Development</p>
-              <a href="https://sichenj.in/">Sichen Jin, Georgia Institute of Technology</a>
+              <a target="_blank" href="https://sichenj.in/">Sichen Jin, Georgia Institute of Technology</a>
 
 
             </div>
 
-            <button className="openbtn" onClick={this.openNav} style={{ position: 'absolute', top: '10px', right: '5px', }}>☰ Project Info</button>
+            <button className="openbtn" onClick={this.openNav} style={{ position: 'absolute', top: '10px', right: '5px', }}>☰ About</button>
 
             <div id="facilityline" style={{ width: '50vw', height: '20vh', display: 'block' }} >
 
@@ -2663,7 +2729,18 @@ class DotMapViewCombine extends React.Component {
                 <span class="slider round"></span>
               </label>
             </div>
+            <div style={{ position: "relative", float: "left", left: "10vw" }}>
+              {/* <span style={{ color: '#f1aca5', position: 'relative', top: '5px', left: '155px', fontSize: '15px' }}>unselect all</span> */}
+              <span style={{ color: '#f1aca5', position: 'relative', top: '5px', right: '15px', fontSize: '15px' }}>unselect all</span>
+              <label class="switch" >
+                <input type="checkbox" onChange={this.legendtoggle} defaultChecked={false} ref={this.legendcheckbox} />
+                <span class="slider round"></span>
+              </label>
+            </div>
           </div>
+          
+            
+          
           {/* <StackLine FACID={this.state.FACID} /> */}
         </div>
       </div>
