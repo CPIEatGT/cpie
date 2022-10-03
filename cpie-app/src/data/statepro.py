@@ -17,9 +17,11 @@ stated = {"AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"Cali
 # print(dict)
 
 # group sum 
-df = pd.read_csv(r'C:\Users\coduser\Documents\GitHub\CPIE\cpie-app\src\data\new_facility_operating_scrubbers_startyear.csv')
+df = pd.read_csv(r'C:\Users\coduser\Documents\GitHub\CPIEatGT\cpie\cpie-app\src\data\facility_operating_scrubbers_startyear.csv')
 
-df.groupby(['FacID','year_scrubbed' ]).count().to_csv('facility_scrubbed_count.csv') 
+df.groupby(['FacID','year_scrubbed' ]).count().to_csv('new_facility_scrubbed_count.csv') 
+df.groupby(['FacID','year_shut' ]).count().to_csv('new_facility_shut_count.csv') 
+
 # for i in stated.keys():
 #     df.replace(to_replace =i, 
 #                  value = stated[i], 

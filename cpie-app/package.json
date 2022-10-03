@@ -1,7 +1,7 @@
 {
   "name": "cpie-app",
   "version": "0.1.0",
-  "homepage": "https://sichenjin.github.io/CPIE",
+  "homepage": "https://CPIEatGT.github.io/cpie",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",

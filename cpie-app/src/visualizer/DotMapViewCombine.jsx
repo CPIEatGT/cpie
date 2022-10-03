@@ -21,8 +21,8 @@ import facDict from "../data/facid_name_dict2.json"
 import facility_line_data from "../data/facility_to_state_year.csv"
 import stateselectdata from "../data/state_to_state_sum_all_fullname.csv";
 import stackdata from "../data/facility_to_state_year_sum2_fullname.csv";
-import facility_shut from "../data/facility_shut_count.csv"
-import facility_scrub from "../data/facility_scrubbed_count.csv"
+import facility_shut from "../data/new_facility_shut_count.csv"
+import facility_scrub from "../data/new_facility_scrubbed_count.csv"
 import statestack from "../data/pm25_facility_state_sum_fullname.csv"
 import landingstate from "../data/landing_state_overall.csv"
 import landingstack from "../data/landing_state_overall_year.csv"
@@ -67,7 +67,7 @@ class DotMapViewCombine extends React.Component {
 
   constructor(props) {
     super(props);
-    this.FACID = 3
+    this.FACID = null
     this.fname = 'Barry, Alabama'
     this.lastserieshover = 'undefined'
     this.statecode = null
@@ -472,7 +472,6 @@ class DotMapViewCombine extends React.Component {
         const minco = parseFloat(d3.min(filteredData, d => parseFloat(d.deaths_coef_2))) - 0.1
         const maxco = parseFloat(d3.max(filteredData, d => parseFloat(d.deaths_coef_2))) + 0.1
 
-        this.color.domain([0, maxco]); // setting the range of the input data 
 
         // extract series data:
         const statenames = filteredData.map(d => {
@@ -486,6 +485,7 @@ class DotMapViewCombine extends React.Component {
         const unistate = statenames.filter(onlyUnique)
 
         var seriesdata = []
+        
 
         unistate.forEach((state) => {
           var stateto = filteredData.filter((d) => {
@@ -512,7 +512,8 @@ class DotMapViewCombine extends React.Component {
             areaStyle: {},
 
             itemStyle: {
-              color: this.color(parseFloat(yearstateto[0]))  //change later
+              color: this.color(d3.sum(yearstateto))
+                // parseFloat(yearstateto[0]))  //change later
             },
             data: yearstateto,
             sum: d3.sum(yearstateto)
@@ -528,6 +529,16 @@ class DotMapViewCombine extends React.Component {
         seriesdata.sort(function (first, second) {
           return parseFloat(second.sum) - parseFloat(first.sum);
         });
+        // if(seriesdata[0]){
+        //   this.color.domain([0, seriesdata[0].sum]);
+        // }
+
+        //  // setting the range of the input data 
+
+        // seriesdata.forEach(sdata=>{
+        //   sdata.itemStyle.color = this.color(sdata.sum)
+          
+        // })
 
         var legenddata = seriesdata.map((d) => {
           return d.name
@@ -801,7 +812,8 @@ class DotMapViewCombine extends React.Component {
             )
         })
 
-        this.ltitle.innerText = 'Statewide deaths associated with '+  this.fnameDict[parseInt(this.FACID)][0]+ ' (' + this.fnameDict[parseInt(this.FACID)][1] + ') Facility'
+        this.ltitle.innerText = "Deaths associated with " + this.fnameDict[parseInt(this.FACID)][0] + "Facility" +"(" + this.fnameDict[parseInt(this.FACID)][1] + ")"
+        // 'Statewide deaths associated with '+  this.fnameDict[parseInt(this.FACID)][0]+ ' (' + this.fnameDict[parseInt(this.FACID)][1] + ') Facility'
 
         // `Statewide deaths associated with emissions from <span style={{ color: '#db4e3e' }} >`+ this.fnameDict[parseInt(this.FACID)][0] + ',' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility ' + `</span> `
 
@@ -828,10 +840,10 @@ class DotMapViewCombine extends React.Component {
 
 
 
-        const minco = parseFloat(d3.min(filteredData, d => parseFloat(d.deaths_coef_2))) - 0.1
-        const maxco = parseFloat(d3.max(filteredData, d => parseFloat(d.deaths_coef_2))) + 0.1
+        // const minco = parseFloat(d3.min(filteredData, d => parseFloat(d.deaths_coef_2))) - 0.1
+        // const maxco = parseFloat(d3.max(filteredData, d => parseFloat(d.deaths_coef_2))) + 0.1
 
-        this.color.domain([0, maxco]); // setting the range of the input data 
+        // this.color.domain([0, maxco]); // setting the range of the input data 
 
         // extract series data:
         const statenames = filteredData.map(d => {
@@ -871,7 +883,7 @@ class DotMapViewCombine extends React.Component {
             areaStyle: {},
 
             itemStyle: {
-              color: this.color(parseFloat(yearstateto[0]))  //change later
+              color: this.color(d3.sum(yearstateto))  //change later
             },
             data: yearstateto,
             sum: d3.sum(yearstateto)
@@ -887,6 +899,14 @@ class DotMapViewCombine extends React.Component {
         seriesdata.sort(function (first, second) {
           return parseFloat(second.sum) - parseFloat(first.sum);
         });
+
+        // if(seriesdata[0]){
+        //   this.color.domain([0, seriesdata[0].sum]);
+        // }
+        // seriesdata.forEach(sdata=>{
+        //   sdata.itemStyle.color = this.color(sdata.sum)
+          
+        // })
 
         var legenddata = seriesdata.map((d) => {
           return d.name
@@ -1114,7 +1134,8 @@ class DotMapViewCombine extends React.Component {
 
         // })
 
-        this.ltitle.innerText = 'Statewide deaths associated with all facilities in ' +   this.statecode
+        this.ltitle.innerText = 'Deaths associated with all facilities in ' + this.statecode
+        // 'Statewide deaths associated with all facilities in ' +   this.statecode
         // 'Statewide deaths associated with emissions from ' + this.statecode
 
         // this.statecode
@@ -1354,9 +1375,11 @@ class DotMapViewCombine extends React.Component {
       //   .style("left",  "10vw")
       //   .text((d) => { return  this.statecode + ' deaths attributable to facilities in other states'; });
 
-      this.ltitle.innerText = 'Statewide deaths associated with all facilities in ' +   this.statecode
+      this.ltitle.innerText = 'Deaths associated with all facilities in ' + this.statecode
+      // 'Statewide deaths associated with all facilities in ' +   this.statecode
       // "Statewide deaths associated with emissions from " + this.statecode
-      this.mtitle.innerText = this.statecode + ' deaths attributable to facilities in other states'
+      this.mtitle.innerText =  this.statecode + " deaths associated with facilities in other states"
+      // this.statecode + ' deaths attributable to facilities in other states'
 
 
 
@@ -1506,7 +1529,8 @@ class DotMapViewCombine extends React.Component {
 
       
 
-      this.ltitle.innerText = 'Statewide deaths associated with '+  this.fnameDict[parseInt(this.FACID)][0]+ ' (' + this.fnameDict[parseInt(this.FACID)][1] + ') Facility'
+      this.ltitle.innerText = "Deaths associated with " + this.fnameDict[parseInt(this.FACID)][0] + "Facility" +"(" + this.fnameDict[parseInt(this.FACID)][1] + ")"
+      // 'Statewide deaths associated with '+  this.fnameDict[parseInt(this.FACID)][0]+ ' (' + this.fnameDict[parseInt(this.FACID)][1] + ') Facility'
 
       // "Statewide deaths associated with emissions from " + this.fnameDict[parseInt(this.FACID)][0] + ', ' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
       // this.fnameDict[parseInt(this.FACID)][0] + ',' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
@@ -1826,8 +1850,10 @@ class DotMapViewCombine extends React.Component {
         });
 
       svgElement.call(zoom);
-
-      this.ltitle.innerText = 'The overall statewide deaths'
+      
+      var pm25 = "2.5"
+      this.ltitle.innerHTML  = "Deaths attributable to coal PM" + pm25.sub()
+      // 'The overall statewide deaths'
 
       this.mtitle.innerText = ''
 
@@ -2029,10 +2055,10 @@ class DotMapViewCombine extends React.Component {
 
 
 
-      const minco = parseFloat(d3.min(data, d => parseFloat(d.deaths_coef_2_all))) - 0.1
-      const maxco = parseFloat(d3.max(data, d => parseFloat(d.deaths_coef_2_all))) + 0.1
+      // const minco = parseFloat(d3.min(data, d => parseFloat(d.deaths_coef_2_all))) - 0.1
+      // const maxco = parseFloat(d3.max(data, d => parseFloat(d.deaths_coef_2_all))) + 0.1
 
-      this.color.domain([0, maxco]); // setting the range of the input data 
+      // this.color.domain([0, maxco]); // setting the range of the input data 
 
       // extract series data:
       const statenames = data.map(d => {
@@ -2072,7 +2098,7 @@ class DotMapViewCombine extends React.Component {
           areaStyle: {},
 
           itemStyle: {
-            color: this.color(parseFloat(yearstateto[0]))  //change later
+            color: this.color(d3.sum(yearstateto))  //change later
           },
           data: yearstateto,
           sum: d3.sum(yearstateto)
@@ -2088,6 +2114,14 @@ class DotMapViewCombine extends React.Component {
       seriesdata.sort(function (first, second) {
         return parseFloat(second.sum) - parseFloat(first.sum);
       });
+
+      // if(seriesdata[0]){
+      //   this.color.domain([0, seriesdata[0].sum]);
+      // }
+      //   seriesdata.forEach(sdata=>{
+      //     sdata.itemStyle.color = this.color(sdata.sum)
+          
+      //   })
 
       var legenddata = seriesdata.map((d) => {
         return d.name
@@ -2339,8 +2373,9 @@ class DotMapViewCombine extends React.Component {
       })
 
 
-
-      this.ltitle.innerText = 'The overall statewide deaths'
+      var pm25 = "2.5"
+      this.ltitle.innerHTML = "Deaths attributable to coal PM" + pm25.sub()
+      // 'The overall statewide deaths'
       $('#loading-image').hide();
     })
 
@@ -2352,7 +2387,7 @@ class DotMapViewCombine extends React.Component {
 
   // create continuous color legend
   updateLegend(colorscale) {
-    var legendheight = 200,
+    var legendheight = 160,
       legendwidth = 80,
       margin = { top: 10, right: 60, bottom: 10, left: 2 };
 
@@ -2539,7 +2574,7 @@ class DotMapViewCombine extends React.Component {
   }
 
   openNav() {
-    document.getElementById("mySidepanel").style.width = "250px";
+    document.getElementById("mySidepanel").style.width = "300px";
   }
 
   closeNav() {
@@ -2583,8 +2618,8 @@ class DotMapViewCombine extends React.Component {
 
     return (
 
-      <div>
-        <h1 style={{ transform: "translate(35vw,0)" }}> Coal Pollution Interactive Explorer </h1>
+      <div style={{  textAlign : "center"}}>
+        <h1 > Coal Pollution Interactive Explorer </h1>
         <div className="centered">
         <h2 className="specific_title" style={{ visibility: "visible", marginTop:'0px'}} ref={input => (this.ltitle = input)}></h2>
       </div>
@@ -2598,7 +2633,7 @@ class DotMapViewCombine extends React.Component {
 
 
 
-            <div style={{ zIndex:10000,width: '150px', height: '20px', position: 'absolute', top: '12vh', left: '35vw' }}>
+            <div style={{ zIndex:10000,width: '150px', height: '20px', position: 'absolute', top: '13vh', left: '35vw' }}>
               <Select
                 // noOptionsMessage={() => 'Select a state to show...'}
                 // LoadingMessage = {()=> 'Select a state to show...'}
@@ -2612,7 +2647,7 @@ class DotMapViewCombine extends React.Component {
             </div>
 
             {
-              <div style={{ zIndex:10000, width: '150px', height: '20px', position: 'absolute', top: '12vh', left: '50vw' }}>
+              <div style={{ zIndex:10000, width: '150px', height: '20px', position: 'absolute', top: '13vh', left: '50vw' }}>
 
                 <Select
                   placeholder='Explore by facility'
@@ -2641,11 +2676,12 @@ class DotMapViewCombine extends React.Component {
               ref={this.svg}
             // ref = {ref}
             >
+              <rect x="5vw" y="15" width="140vh" height="75vh" style={{"position": "absolute","fill": "none","top": "18vh","left": "2vw","stroke": '#f1aca5',"stroke-width":"5", "fill-opacity":"0.1", "stroke-opacity":"0.9"}}></rect>
 
 
 
             </svg>
-            <h3 style={{ position: 'absolute', top: '62vh' }}> <span ref={input => (this.mtitle = input)}></span> </h3>
+            <h3 style={{ position: 'absolute', top: '66vh' }}> <span ref={input => (this.mtitle = input)}></span> </h3>
 
             <svg
               // width={this.width}
@@ -2658,12 +2694,14 @@ class DotMapViewCombine extends React.Component {
               ref={input => (this.targetsvg = input)}
             // ref = {ref}
             >
+                            <rect x="5vw" y="15" width="140vh" height="75vh" style={{"position": "absolute","fill": "none","top": "18vh","left": "2vw","stroke": '#f1aca5',"stroke-width":"5", "fill-opacity":"0.1", "stroke-opacity":"0.9"}}></rect>
+
 
 
 
             </svg>
 
-            <div id="mySidepanel" className="sidepanel">
+            <div id="mySidepanel" className="sidepanel" style={{textAlign:"left"}}>
               <a  href="javascript:void(0)" className="closebtn" onClick={this.closeNav}>×</a>
               <p style={{paddingTop:'0px'}}>Authors</p>
 
@@ -2677,7 +2715,7 @@ class DotMapViewCombine extends React.Component {
               <p >Data and methods</p>
               <p className="insidep"> Facility information is taken from <a target="_blank" className="insidea" href="https://campd.epa.gov/">EPA’s Clean Air Markets Program Data </a> (https://campd.epa.gov/) .</p>
               <p className="insidep"> Population exposure is derived from each facility’s sulfur dioxide (SO<sub>2</sub>) emissions, atmospheric transport and dispersion, and chemical conversion to fine particulate matter (PM<sub>2.5</sub>). Other exposures and impacts (e.g., climate impacts) are not considered.</p>
-              <p className="insidep"> Deaths correspond to premature mortalities in the US Medicare population.</p>
+              <p className="insidep"> Deaths correspond to excess mortalities in the US Medicare population.</p>
               <p className="insidep"> More detail on the methods is available here:</p>
               <p className="insidep"> Lucas Henneman, Christine Choirat, Irene Dedoussi, Francesca Dominici, Jessica Roberts, Corwin Zigler. Coal’s toll: 22 years of Medicare deaths attributable to electricity generation. <i>Under review</i>.</p>
               
@@ -2712,9 +2750,9 @@ class DotMapViewCombine extends React.Component {
           {/* <MapView year = {this.year} statecode = {this.statecode} setyear={year => this.setyear(year)} setstatecode={statecode => this.setstatecode(statecode)}/> */}
 
         </div>
-        <div>          <span style={{ color: 'black', position: 'absolute', top: '54vh', left: '38vw', fontSize: '10px' }}> Statewide Deaths </span>
+        <div>          <span style={{ color: 'black', position: 'absolute', top: '68vh', left: '38vw', fontSize: '10px' }}> Statewide Deaths </span>
         </div>
-        <div id="legend2" style={{ display: 'inline-block', position: 'absolute', top: '55vh', left: '40vw' }} >
+        <div id="legend2" style={{ display: 'inline-block', position: 'absolute', top: '69vh', left: '40vw' }} >
         </div>
 
         <div class="column"  >

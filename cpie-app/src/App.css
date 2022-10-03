@@ -69,6 +69,7 @@ div.tooltip {
   /* overflow: auto; */
   max-height: 400px;         
 	/* font: 12px sans-serif;         */
+  font-weight: bold;
 	background: none;   
 	border: 0px;      
 	border-radius: 8px;           
