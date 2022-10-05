@@ -1,25 +1,25 @@
 {
   "files": {
-    "main.css": "/cpie/static/css/main.9587b95c.css",
-    "main.js": "/cpie/static/js/main.03a8cfe9.js",
+    "main.css": "/cpie/static/css/main.8b46ef8b.css",
+    "main.js": "/cpie/static/js/main.a78b8bd4.js",
     "static/js/787.51b4e4f1.chunk.js": "/cpie/static/js/787.51b4e4f1.chunk.js",
     "static/media/facility_to_state_year_sum2_fullname.csv": "/cpie/static/media/facility_to_state_year_sum2_fullname.166980a4d5fd0b9755f1.csv",
     "static/media/pm25_facility_state_sum_fullname.csv": "/cpie/static/media/pm25_facility_state_sum_fullname.c27cd8685cd60a8e7ffa.csv",
-    "static/media/facility_to_state_sum_all_fullname.csv": "/cpie/static/media/facility_to_state_sum_all_fullname.31629b2fc86be1a61057.csv",
-    "static/media/facility_to_state_year.csv": "/cpie/static/media/facility_to_state_year.c9bc35fdd1ab22e218c6.csv",
-    "static/media/state_to_state_sum_all_fullname.csv": "/cpie/static/media/state_to_state_sum_all_fullname.4685edc895bdd57611e1.csv",
-    "static/media/landing_state_overall_year.csv": "/cpie/static/media/landing_state_overall_year.db580971e12a4cb030e6.csv",
+    "static/media/facility_to_state_sum_all_fullname.csv": "/cpie/static/media/facility_to_state_sum_all_fullname.bf2efac3e56499a5162e.csv",
+    "static/media/facility_to_state_year.csv": "/cpie/static/media/facility_to_state_year.7de5fb1717905dbafd1d.csv",
+    "static/media/state_to_state_sum_all_fullname.csv": "/cpie/static/media/state_to_state_sum_all_fullname.87a86944f63c9eb8f0e3.csv",
+    "static/media/landing_state_overall_year.csv": "/cpie/static/media/landing_state_overall_year.9b882b7f48df9b5e83e3.csv",
     "static/media/new_facility_shut_count.csv": "/cpie/static/media/new_facility_shut_count.8896b3d072fb265f26d7.csv",
     "static/media/new_facility_scrubbed_count.csv": "/cpie/static/media/new_facility_scrubbed_count.4501b3f66308990d202b.csv",
     "static/media/logo.svg": "/cpie/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
-    "static/media/landing_state_overall.csv": "/cpie/static/media/landing_state_overall.571a7c98609fe3c616dd.csv",
+    "static/media/landing_state_overall.csv": "/cpie/static/media/landing_state_overall.4d28b901a049bbc1c060.csv",
     "index.html": "/cpie/index.html",
-    "main.9587b95c.css.map": "/cpie/static/css/main.9587b95c.css.map",
-    "main.03a8cfe9.js.map": "/cpie/static/js/main.03a8cfe9.js.map",
+    "main.8b46ef8b.css.map": "/cpie/static/css/main.8b46ef8b.css.map",
+    "main.a78b8bd4.js.map": "/cpie/static/js/main.a78b8bd4.js.map",
     "787.51b4e4f1.chunk.js.map": "/cpie/static/js/787.51b4e4f1.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.9587b95c.css",
-    "static/js/main.03a8cfe9.js"
+    "static/css/main.8b46ef8b.css",
+    "static/js/main.a78b8bd4.js"
   ]
 }
