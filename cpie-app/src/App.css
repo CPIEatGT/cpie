@@ -235,7 +235,7 @@ input:checked + .slider:before {
 .sidepanel .closebtn {
   position: absolute;
   top: 0;
-  right: 200px;
+  right: 250px;
   font-size: 30px;
 }
 

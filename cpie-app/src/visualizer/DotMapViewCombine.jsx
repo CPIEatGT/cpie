@@ -6,7 +6,6 @@ import { observer } from "mobx-react";
 import { observable, computed, reaction, action } from "mobx";
 import * as d3 from 'd3';
 import { geoAlbersUsa, geoPath } from "d3-geo"
-// import {Legend} from "./Legend"
 import { interpolateOrRd } from "d3-scale-chromatic"
 import Select from 'react-select';
 import Picker from 'react-mobile-picker-scroll';
@@ -14,18 +13,18 @@ import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import $ from 'jquery';
 
-import statedata from "../data/facility_to_state_sum_all_fullname.csv";
+import statedata from "../data/newdata/facility_to_state_sum_all_fullname.csv";
 import statejson from "../data/gz_2010_us_040_00_500k.json"
 import facIDname from "../data/facid_name.json"
 import facDict from "../data/facid_name_dict2.json"
-import facility_line_data from "../data/facility_to_state_year.csv"
-import stateselectdata from "../data/state_to_state_sum_all_fullname.csv";
-import stackdata from "../data/facility_to_state_year_sum2_fullname.csv";
+import facility_line_data from "../data/newdata/facility_to_state_year.csv"
+import stateselectdata from "../data/newdata/state_to_state_sum_all_fullname.csv";
+import stackdata from "../data/newdata/facility_to_state_year_sum2_fullname.csv";
 import facility_shut from "../data/new_facility_shut_count.csv"
 import facility_scrub from "../data/new_facility_scrubbed_count.csv"
-import statestack from "../data/pm25_facility_state_sum_fullname.csv"
-import landingstate from "../data/landing_state_overall.csv"
-import landingstack from "../data/landing_state_overall_year.csv"
+import statestack from "../data/newdata/pm25_facility_state_sum_fullname.csv"
+import landingstate from "../data/newdata/landing_state_overall.csv"
+import landingstack from "../data/newdata/landing_state_overall_year.csv"
 import { timeHours } from "d3";
 
 
@@ -40,10 +39,6 @@ class DotMapViewCombine extends React.Component {
     this.fnameDict = JSON.parse(fstr)[0];
 
 
-
-    // this.deathGeoJson()
-
-    // this.facilityLine(this.FACID)
     this.myChart = echarts.init(this.div.current, null, { renderer: 'svg' });
 
 
@@ -54,14 +49,12 @@ class DotMapViewCombine extends React.Component {
 
     };
 
-    // this.prepMark()
+  
     this.landingview()
   }
 
   componentDidUpdate(prevProps) {
-    // this.deathGeoJson()
-
-    // this.facilityLine(this.FACID)
+  
   }
 
 
@@ -81,18 +74,7 @@ class DotMapViewCombine extends React.Component {
       .append("div")
       .attr("class", "tooltip")
       .style("opacity", 0);
-    // this.state = {
-    //   statedFacList: []
-    // };
-
-
-    // this.isChecked=true,
-
-    // this.state = {
-    //   year: 1999,
-    //   statecode:'Alabama'
-    // }
-
+  
 
   }
 
@@ -101,9 +83,6 @@ class DotMapViewCombine extends React.Component {
   @observable lineoption
 
 
-  // state = {
-  //   selectedOption: null,
-  // };
 
   customFilter = (option, searchText) => {
 
@@ -118,9 +97,6 @@ class DotMapViewCombine extends React.Component {
   };
 
 
-  //Width and height of map
-
-  //  @observable json 
 
   handleChange = selectedOption => {
     $('#loading-image').show();
@@ -138,22 +114,12 @@ class DotMapViewCombine extends React.Component {
     this.dottooltip.transition()
       .duration(500)
       .style("opacity", 0);
-      
-    // this.checkbox.current.checked = !this.checkbox.current.checked 
-    // var filterfacidjson = [
-    //   { 'value': 'Alabama', 'label': 'Alabama' }, { 'value': 'Alaska', 'label': 'Alaska' } ]
-    // this.selectref0.options = filterfacidjson
-    // var self = this
+     
 
   };
 
 
 
-  // yearChange = (name, value) => {
-  //   this.props.setyear(value)
-  //   this.year = value
-  //   this.deathGeoJson()
-  // }
 
   width = 860;
   height = 450;
@@ -174,10 +140,7 @@ class DotMapViewCombine extends React.Component {
     this.statecode = null
 
     this.FACID = selectedOption.value[1]
-    // // this.deathGeoJson()
-    // this.stateSelect()
-    // this.stackLine({data:[]})
-    // // this.checkbox.current.checked = !this.checkbox.current.checked 
+   
     const targetsvgElement = d3.select(this.targetsvg)
     this.legendcheckbox.current.checked = false
     // targetsvgElement.append("g").attr("id", "tstatepath")
@@ -1529,7 +1492,7 @@ class DotMapViewCombine extends React.Component {
 
       
 
-      this.ltitle.innerText = "Deaths associated with " + this.fnameDict[parseInt(this.FACID)][0] + "Facility" +"(" + this.fnameDict[parseInt(this.FACID)][1] + ")"
+      this.ltitle.innerText = "Deaths associated with " + this.fnameDict[parseInt(this.FACID)][0] + " Facility" +" (" + this.fnameDict[parseInt(this.FACID)][1] + ")"
       // 'Statewide deaths associated with '+  this.fnameDict[parseInt(this.FACID)][0]+ ' (' + this.fnameDict[parseInt(this.FACID)][1] + ') Facility'
 
       // "Statewide deaths associated with emissions from " + this.fnameDict[parseInt(this.FACID)][0] + ', ' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
@@ -2676,7 +2639,7 @@ class DotMapViewCombine extends React.Component {
               ref={this.svg}
             // ref = {ref}
             >
-              <rect x="5vw" y="15" width="140vh" height="75vh" style={{"position": "absolute","fill": "none","top": "18vh","left": "2vw","stroke": '#f1aca5',"stroke-width":"5", "fill-opacity":"0.1", "stroke-opacity":"0.9"}}></rect>
+              {/* <rect x="5vw" y="15" width="140vh" height="75vh" style={{"position": "absolute","fill": "none","top": "18vh","left": "2vw","stroke": '#f1aca5',"stroke-width":"5", "fill-opacity":"0.1", "stroke-opacity":"0.9"}}></rect> */}
 
 
 
@@ -2694,7 +2657,7 @@ class DotMapViewCombine extends React.Component {
               ref={input => (this.targetsvg = input)}
             // ref = {ref}
             >
-                            <rect x="5vw" y="15" width="140vh" height="75vh" style={{"position": "absolute","fill": "none","top": "18vh","left": "2vw","stroke": '#f1aca5',"stroke-width":"5", "fill-opacity":"0.1", "stroke-opacity":"0.9"}}></rect>
+                            {/* <rect x="5vw" y="15" width="140vh" height="75vh" style={{"position": "absolute","fill": "none","top": "18vh","left": "2vw","stroke": '#f1aca5',"stroke-width":"5", "fill-opacity":"0.1", "stroke-opacity":"0.9"}}></rect> */}
 
 
 
@@ -2705,12 +2668,12 @@ class DotMapViewCombine extends React.Component {
               <a  href="javascript:void(0)" className="closebtn" onClick={this.closeNav}>×</a>
               <p style={{paddingTop:'0px'}}>Authors</p>
 
-              <a target="_blank" href="http://lucashennem.com/">Lucas Henneman, George Mason University</a>
+              <a target="_blank" href="https://www.lucashenneman.org/">Lucas Henneman, George Mason University</a>
               <a  target="_blank"  href="#">Christine Choirat, ETH Zürich and EPFL</a>
-              <a target="_blank" href="#">Irene Dedoussi, TU Delft</a>
-              <a  target="_blank" href="#">Francesca Dmonici, Harvard TH Chan School of Public Health</a>
-              <a target="_blank" href="#">Jessica Roberts, Georgia Institute of Technology</a>
-              <a target="_blank" href="#">Corwin Ziger, University of Texas, Austin</a>
+              <a target="_blank" href="https://dedoussi.com/">Irene Dedoussi, TU Delft</a>
+              <a  target="_blank" href="https://www.hsph.harvard.edu/profile/francesca-dominici/">Francesca Dmonici, Harvard TH Chan School of Public Health</a>
+              <a target="_blank" href="http://jessicaannroberts.com/">Jessica Roberts, Georgia Institute of Technology</a>
+              <a target="_blank" href="https://cns.utexas.edu/directory/item/3761-zigler-corwin?Itemid=349">Corwin Ziger, University of Texas, Austin</a>
 
               <p >Data and methods</p>
               <p className="insidep"> Facility information is taken from <a target="_blank" className="insidea" href="https://campd.epa.gov/">EPA’s Clean Air Markets Program Data </a> (https://campd.epa.gov/) .</p>
