@@ -1977,7 +1977,7 @@ class DotMapViewCombine extends React.Component {
     return (
 
       <div style={{  textAlign : "center"}}>
-        <h1 > Coal Pollution Interactive Explorer </h1>
+        <h1 > Coal Pollution Impacts Explorer </h1>
         <div className="centered">
         <h2 className="specific_title" style={{ visibility: "visible", marginTop:'0px'}} ref={input => (this.ltitle = input)}></h2>
       </div>
@@ -2058,10 +2058,10 @@ class DotMapViewCombine extends React.Component {
               <p style={{paddingTop:'0px'}}>Authors</p>
 
               <a target="_blank" href="https://www.lucashenneman.org/">Lucas Henneman, George Mason University</a>
-              <a  target="_blank"  href="#">Christine Choirat, ETH Zürich and EPFL</a>
+              <a  target="_blank"  href="https://cchoirat.gitlab.io/">Christine Choirat, ETH Zürich and EPFL</a>
               <a target="_blank" href="https://dedoussi.com/">Irene Dedoussi, TU Delft</a>
               <a  target="_blank" href="https://www.hsph.harvard.edu/profile/francesca-dominici/">Francesca Dmonici, Harvard TH Chan School of Public Health</a>
-              <a target="_blank" href="http://jessicaannroberts.com/">Jessica Roberts, Georgia Institute of Technology</a>
+              <a target="_blank" href="https://tiles.cc.gatech.edu">Jessica Roberts, Georgia Institute of Technology</a>
               <a target="_blank" href="https://cns.utexas.edu/directory/item/3761-zigler-corwin?Itemid=349">Corwin Ziger, University of Texas, Austin</a>
 
               <p >Data and methods</p>
