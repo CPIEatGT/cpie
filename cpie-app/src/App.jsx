@@ -5,8 +5,7 @@ import { observer } from "mobx-react";
 import { observable, computed, reaction, action } from "mobx";
 import classnames from "classnames";
 
-import MapView from "./visualizer/MapView";
-import StackLine from "./visualizer/StackLine";
+
 import DotMapViewCombine from "./visualizer/DotMapViewCombine";
 
 @observer

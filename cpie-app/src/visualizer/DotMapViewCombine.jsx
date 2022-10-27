@@ -13,16 +13,16 @@ import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import $ from 'jquery';
 
-import statedata from "../data/newdata/facility_to_state_sum_all_fullname.csv";
+import statedata from "../data/newdata/facility_to_state_sum_all_fullname.csv";  // facility to state data
 import statejson from "../data/gz_2010_us_040_00_500k.json"
 import facIDname from "../data/facid_name.json"
 import facDict from "../data/facid_name_dict2.json"
 import facility_line_data from "../data/newdata/facility_to_state_year.csv"
-import stateselectdata from "../data/newdata/state_to_state_sum_all_fullname.csv";
-import stackdata from "../data/newdata/facility_to_state_year_sum2_fullname.csv";
+import stateselectdata from "../data/newdata/state_to_state_sum_all_fullname.csv";  // state to state data
+import stackdata from "../data/newdata/facility_to_state_year_sum2_fullname.csv";  // facility stackline chart data
 import facility_shut from "../data/new_facility_shut_count.csv"
 import facility_scrub from "../data/new_facility_scrubbed_count.csv"
-import statestack from "../data/newdata/pm25_facility_state_sum_fullname.csv"
+import statestack from "../data/newdata/pm25_facility_state_sum_fullname.csv"  // state stackline chart data
 import landingstate from "../data/newdata/landing_state_overall.csv"
 import landingstack from "../data/newdata/landing_state_overall_year.csv"
 import { timeHours } from "d3";
@@ -33,15 +33,13 @@ import { timeHours } from "d3";
 class DotMapViewCombine extends React.Component {
 
   componentDidMount() {
-    // this.FacIDoptions(this)
+ 
 
     var fstr = JSON.stringify(facDict);
     this.fnameDict = JSON.parse(fstr)[0];
 
 
     this.myChart = echarts.init(this.div.current, null, { renderer: 'svg' });
-
-
 
 
     window.onresize = () => {
@@ -79,25 +77,14 @@ class DotMapViewCombine extends React.Component {
   }
 
   @observable year = '1999'
-  // @observable statecode = 'Alabama'
+  
   @observable lineoption
 
 
 
-  customFilter = (option, searchText) => {
+  
 
-    if (
-      option.data.label.toLowerCase().includes(searchText.toLowerCase()) ||
-      option.data.value.toLowerCase().includes(searchText.toLowerCase())
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-
-
+  // When state dropdown menu are change, update the state associate view 
   handleChange = selectedOption => {
     $('#loading-image').show();
     this.FACID = null
@@ -107,9 +94,9 @@ class DotMapViewCombine extends React.Component {
     this.props.setstatecode(selectedOption.value)
     this.statecode = selectedOption.value
 
-    // this.setState({ statedFacList:  })
-    // this.deathGeoJson()
+    // When state dropdown menu are change, update the state associate view 
     this.stateSelect()
+    // update the stack line chart 
     this.stackLine({ data: [] })
     this.dottooltip.transition()
       .duration(500)
@@ -132,6 +119,7 @@ class DotMapViewCombine extends React.Component {
   }, { 'value': 'Oregon', 'label': 'Oregon' }, { 'value': 'Palau', 'label': 'Palau' }, { 'value': 'Pennsylvania', 'label': 'Pennsylvania' }, { 'value': 'Puerto Rico', 'label': 'Puerto Rico' }, { 'value': 'Rhode Island', 'label': 'Rhode Island' }, { 'value': 'South Carolina', 'label': 'South Carolina' }, { 'value': 'South Dakota', 'label': 'South Dakota' }, { 'value': 'Tennessee', 'label': 'Tennessee' }, { 'value': 'Texas', 'label': 'Texas' }, { 'value': 'Utah', 'label': 'Utah' }, { 'value': 'Vermont', 'label': 'Vermont' }, { 'value': 'Virgin Island', 'label': 'Virgin Island' }, { 'value': 'Virginia', 'label': 'Virginia' }, { 'value': 'Washington', 'label': 'Washington' }, { 'value': 'West Virginia', 'label': 'West Virginia' }, { 'value': 'Wisconsin', 'label': 'Wisconsin' }, { 'value': 'Wyoming', 'label': 'Wyoming' }];
 
 
+  // when facility dropdown menu is changed, update the facility associated view
   FACIDhandleChange = selectedOption => {
 
 
@@ -147,7 +135,9 @@ class DotMapViewCombine extends React.Component {
     targetsvgElement.select("#tstatepath").selectAll("path").remove()
     this.mtitle.innerText = ''
 
+    // when facility dropdown menu is changed, update the facility associated view
     this.deathGeoJson()
+    // read the machine scrub and shut down dataset and update the stackline
     this.prepMark()
 
     d3.selectAll("circle")
@@ -168,27 +158,10 @@ class DotMapViewCombine extends React.Component {
 
 
 
-    // self.facilityLine(self.FACID)
-    // self.props.setFACID(parseInt(d.target.__data__.FacID))
-   
-
 
   };
 
-  FacIDoptions = (self) => {
-    // var facidstr = JSON.stringify(facIDname);
-    // var facidjson = JSON.parse(facidstr);
-    // var filterfacidjson = facidjson.filter((d) => {
-
-    //   if(d.value[0] === 'Alabama') {
-    //     return d;
-    //   }
-
-    // })
-
-
-  }
-
+  
 
 
 
@@ -289,6 +262,7 @@ class DotMapViewCombine extends React.Component {
   }
 
 
+  // read the scrub and shut down information for facility, and update the stackline chart 
   prepMark() {
     d3.csv(facility_shut).then((shutdata) => {
 
@@ -412,6 +386,8 @@ class DotMapViewCombine extends React.Component {
     })
   }
 
+
+  // update the stack line when facility or state is changed 
   stackLine(markDict) {
     // console.log(markDict)
 
@@ -492,16 +468,7 @@ class DotMapViewCombine extends React.Component {
         seriesdata.sort(function (first, second) {
           return parseFloat(second.sum) - parseFloat(first.sum);
         });
-        // if(seriesdata[0]){
-        //   this.color.domain([0, seriesdata[0].sum]);
-        // }
-
-        //  // setting the range of the input data 
-
-        // seriesdata.forEach(sdata=>{
-        //   sdata.itemStyle.color = this.color(sdata.sum)
-          
-        // })
+        
 
         var legenddata = seriesdata.map((d) => {
           return d.name
@@ -652,11 +619,7 @@ class DotMapViewCombine extends React.Component {
         };
 
 
-        // var chartDom = document.getElementById('linestack');
-        // var myChart = echarts.init(chartDom);
-        // myChart.setOption(this.lineoption);
-
-        // var chartDom = document.getElementById('linestack2');
+        
 
         this.myChart.setOption(this.lineoption, {
           notMerge: true
@@ -665,10 +628,7 @@ class DotMapViewCombine extends React.Component {
 
 
         this.myChart.getZr().on('mouseover', (params) => {
-          // set a small delay before continuing to ensure that series highlight/emphasis-state has already taken effect within Echarts. A single tick is not enough.
-          // let zrTimeout = setTimeout(() => {
-
-
+          
           // get the polyline/polygon drawing element from the ZRender component which is servicing a series and is in emphasis/highlight state
           const seriesPolyShape = this.myChart.getZr().storage._displayList.find(d => d.currentStates[0] === "emphasis" && d.parent?.parent?.__ecComponentInfo?.mainType === "series")
 
@@ -682,8 +642,7 @@ class DotMapViewCombine extends React.Component {
               return
             }
           });
-          // seriesPolyShape?.parent?.parent?.__ecComponentInfo?.index
-          // params.target.__ec_inner_7.seriesIndex
+          
 
           if ((typeof (highlightedSeriesIndex) === "undefined")) {
             this.dottooltip.transition()
@@ -750,9 +709,6 @@ class DotMapViewCombine extends React.Component {
 
 
 
-          // }, 5)
-
-
 
         })
 
@@ -775,12 +731,8 @@ class DotMapViewCombine extends React.Component {
             )
         })
 
-        this.ltitle.innerText = "Deaths associated with " + this.fnameDict[parseInt(this.FACID)][0] + "Facility" +"(" + this.fnameDict[parseInt(this.FACID)][1] + ")"
-        // 'Statewide deaths associated with '+  this.fnameDict[parseInt(this.FACID)][0]+ ' (' + this.fnameDict[parseInt(this.FACID)][1] + ') Facility'
-
-        // `Statewide deaths associated with emissions from <span style={{ color: '#db4e3e' }} >`+ this.fnameDict[parseInt(this.FACID)][0] + ',' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility ' + `</span> `
-
-        // this.FACID.toString() 
+        this.ltitle.innerText = "Deaths associated with " + this.fnameDict[parseInt(this.FACID)][0] + " Facility" +" (" + this.fnameDict[parseInt(this.FACID)][1] + ")"
+        
         $('#loading-image').hide();
 
       })
@@ -788,8 +740,6 @@ class DotMapViewCombine extends React.Component {
 
     } else if (this.statecode) {
       d3.csv(statestack).then((data) => {
-
-
 
 
         //filter data
@@ -801,12 +751,6 @@ class DotMapViewCombine extends React.Component {
 
         })
 
-
-
-        // const minco = parseFloat(d3.min(filteredData, d => parseFloat(d.deaths_coef_2))) - 0.1
-        // const maxco = parseFloat(d3.max(filteredData, d => parseFloat(d.deaths_coef_2))) + 0.1
-
-        // this.color.domain([0, maxco]); // setting the range of the input data 
 
         // extract series data:
         const statenames = filteredData.map(d => {
@@ -863,14 +807,7 @@ class DotMapViewCombine extends React.Component {
           return parseFloat(second.sum) - parseFloat(first.sum);
         });
 
-        // if(seriesdata[0]){
-        //   this.color.domain([0, seriesdata[0].sum]);
-        // }
-        // seriesdata.forEach(sdata=>{
-        //   sdata.itemStyle.color = this.color(sdata.sum)
-          
-        // })
-
+        
         var legenddata = seriesdata.map((d) => {
           return d.name
         })
@@ -886,21 +823,7 @@ class DotMapViewCombine extends React.Component {
 
         this.lineoption = {
 
-          // tooltip: {
-          //   trigger: 'axis',
-          //   // textStyle:{fontSize : 5},
-          //   // formatter: (params)=>{
-          //   //   return params.sum
-          //   // },
-          //   padding: 2,
-          //   position: [10, 10],
-          //   axisPointer: {
-          //     type: 'none',
-          //     label: {
-          //       backgroundColor: '#6a7985'
-          //     }
-          //   }
-          // },
+          
           title: {
             text:Math.ceil( totalDeath / 10) * 10 + ' Deaths',
   
@@ -930,18 +853,7 @@ class DotMapViewCombine extends React.Component {
             data: legenddata
           },
 
-          // tooltip: {
-          //   trigger: 'axis',
-          //   axisPointer: {
-
-          //     label: {
-          //       backgroundColor: '#6a7985'
-          //     }
-          //   }
-          // },
-          // legend: {
-          //   data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
-          // },
+          
 
           grid: {
             left: '3%',
@@ -952,36 +864,7 @@ class DotMapViewCombine extends React.Component {
           xAxis: [
             {
               type: 'category',
-              // axisLabel:{interval:0,
-              //   // fontSize: 
-              // }  ,
-              // axisPointer: {
-              //   value: this.props.year,
-              //   snap: true,
-              //   lineStyle: {
-              //     color: 'rgb(100,100,100)',
-              //     width: 3
-              //   },
-              //   label: {
-              //     show: false,
-              //     formatter: (params) => {
-              //       console.log(params.value)
-              //       if (params.value !== this.year) {
-              //         // ...
-              //         this.year = params.value
-              //         // this.props.setyear(params.value)
-              //         //...
-              //       }
-              //       return null;
-              //     }
-
-              //   },
-              //   handle: {
-              //     show: false,
-              //     color: 'rgb(100,100,100)',
-              //     size: 20,
-              //   }
-              // },
+              
               boundaryGap: false,
               data: d3.range(1999, 2021, 1)
             }
@@ -997,110 +880,17 @@ class DotMapViewCombine extends React.Component {
         };
 
 
-        // var chartDom = document.getElementById('linestack');
-        // var myChart = echarts.init(chartDom);
-        // myChart.setOption(this.lineoption);
-
-        // var chartDom = document.getElementById('linestack2');
+       
 
         this.myChart.setOption(this.lineoption, {
           notMerge: true
 
         });
 
-        // this.myChart.getZr().on('click', (params) => {
-        //   // set a small delay before continuing to ensure that series highlight/emphasis-state has already taken effect within Echarts. A single tick is not enough.
-        //   // let zrTimeout = setTimeout(() => {
-
-
-        //     // get the polyline/polygon drawing element from the ZRender component which is servicing a series and is in emphasis/highlight state
-        //     const seriesPolyShape = this.myChart.getZr().storage._displayList.find(d => d.currentStates[0] === "emphasis" && d.parent?.parent?.__ecComponentInfo?.mainType === "series")
-
-        //     // get the series index
-
-
-        //     var highlightedSeriesIndex =   seriesPolyShape?.parent?.parent?.__ecComponentInfo?.index
-        //     // params.target.__ec_inner_7.seriesIndex
-
-        //     if ((typeof (highlightedSeriesIndex) === "undefined") ) {
-        //       this.dottooltip.transition()
-        //       .duration(500)
-        //       .style("opacity", 0);
-
-        //       const svgElement = d3.select(this.svg.current)
-
-        //       svgElement.select("#statepath").selectAll("path")
-        //         .style("stroke",
-        //           "#fff"
-
-
-        //         )
-        //         .style("stroke-width",
-        //           "1"
-
-        //         )
-        //         return 
-
-
-        //     }
-
-        //     if( (highlightedSeriesIndex !== this.lastserieshover)) {
-
-        //       this.lastserieshover = highlightedSeriesIndex
-
-        //       var series = this.myChart.getOption().series;
-        //       var sumvalue = series[highlightedSeriesIndex].sum
-        //       var statename = series[highlightedSeriesIndex].name
-
-
-        //       // tooltip 
-        //       const pointInPixel = [params.offsetX, params.offsetY];
-        //       const pointInGrid = this.myChart.convertFromPixel('grid', pointInPixel);
-        //       this.dottooltip.transition()
-        //         .duration(200)
-        //         .style("opacity", .9);
-        //       this.dottooltip.text( "Causes around" + Math.ceil(sumvalue / 10) * 10 + " deaths in " + statename )
-        //         .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw' )
-        //         .style("top", (params.offsetY ) + "px");
-
-        //       const svgElement = d3.select(this.svg.current)
-
-        //       svgElement.select("#statepath").selectAll("path")
-        //         .style("stroke", (d, i) => {
-        //           if (d.properties.NAME === statename) {
-        //             console.log(statename)
-        //             console.log(d.properties.NAME)
-        //             return "rgb(100,100,100)"
-        //           } else {
-        //             return "#fff"
-        //           }
-
-        //         })
-        //         .style("stroke-width", (d) => {
-        //           if (d.properties.NAME === statename) {
-        //             return "4"
-        //           } else {
-        //             return "1"
-        //           }
-        //         })
-
-
-
-
-        //     }
-
-
-
-        //   // }, 5)
-
-
-
-        // })
+        
 
         this.ltitle.innerText = 'Deaths associated with all facilities in ' + this.statecode
-        // 'Statewide deaths associated with all facilities in ' +   this.statecode
-        // 'Statewide deaths associated with emissions from ' + this.statecode
-
+       
         // this.statecode
         $('#loading-image').hide();
       })
@@ -1113,15 +903,11 @@ class DotMapViewCombine extends React.Component {
 
   }
 
+  // When state dropdown menu are change, update the state associate view 
   stateSelect() {
+    // state to state data
     d3.csv(stateselectdata).then((data) => {
       var self = this;
-
-
-
-
-      //filter data
-
 
 
       var filteredData = data.filter((d) => {
@@ -1182,9 +968,6 @@ class DotMapViewCombine extends React.Component {
       }
 
 
-
-      // Bind the data to the SVG and create one path per GeoJSON feature
-
       const svgElement = d3.select(this.svg.current)
       const g = svgElement.append("g").attr("id", "statepath")
       svgElement.select("#statepath").selectAll("path").remove()
@@ -1226,10 +1009,7 @@ class DotMapViewCombine extends React.Component {
           }
         })
         .on("click", (d) => {
-          // this.props.setstatecode(d.target.__data__.properties.NAME)
-          // this.statecode = d.target.__data__.properties.NAME
-          // this.deathGeoJson()
-          // this.updateLegend()
+          
 
         })
       const zoom = d3.zoom()
@@ -1327,22 +1107,9 @@ class DotMapViewCombine extends React.Component {
 
       targetsvgElement.select("#statefromtext").remove()
 
-      // targetsvgElement.append("text")
-      //   .attr("id", "statefromtext")
-      //   // .attr("x", '40vw')
-      //   // .attr("y", '30vh')
-      //   .attr("dy", ".35em")
-      //   .style('font-size', '50px')
-      //   .style("position", "absolute")
-      //   .style("top",  "50vh")
-      //   .style("left",  "10vw")
-      //   .text((d) => { return  this.statecode + ' deaths attributable to facilities in other states'; });
-
+      
       this.ltitle.innerText = 'Deaths associated with all facilities in ' + this.statecode
-      // 'Statewide deaths associated with all facilities in ' +   this.statecode
-      // "Statewide deaths associated with emissions from " + this.statecode
       this.mtitle.innerText =  this.statecode + " deaths associated with facilities in other states"
-      // this.statecode + ' deaths attributable to facilities in other states'
 
 
 
@@ -1381,6 +1148,7 @@ class DotMapViewCombine extends React.Component {
 
   }
 
+  // when facility dropdown menu is changed, change the facility associated view 
   deathGeoJson() {
     $('#loading-image').show();
 
@@ -1483,33 +1251,14 @@ class DotMapViewCombine extends React.Component {
           }
         })
         .on("click", (d) => {
-          // this.props.setstatecode(d.target.__data__.properties.NAME)
-          // this.statecode = d.target.__data__.properties.NAME
-          // this.deathGeoJson()
-          // this.updateLegend()
+         
 
         })
 
       
 
       this.ltitle.innerText = "Deaths associated with " + this.fnameDict[parseInt(this.FACID)][0] + " Facility" +" (" + this.fnameDict[parseInt(this.FACID)][1] + ")"
-      // 'Statewide deaths associated with '+  this.fnameDict[parseInt(this.FACID)][0]+ ' (' + this.fnameDict[parseInt(this.FACID)][1] + ') Facility'
-
-      // "Statewide deaths associated with emissions from " + this.fnameDict[parseInt(this.FACID)][0] + ', ' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
-      // this.fnameDict[parseInt(this.FACID)][0] + ',' + this.fnameDict[parseInt(this.FACID)][1] + ' Facility '
-
-      // + this.FACID.toString() 
-
-      // svgElement.append("text")
-      // .attr("x", '60vw' )
-      // .attr("y", '40vh')
-      // .attr("dy", ".35em")
-      // .style('font-size', '50px')
-      // .text((d) =>{ return 'Death in ' + this.statecode + 'caused by other states.'; });
-
-
-
-
+      
 
       var uniFilterData = [...new Map(data.map(item =>
         [item['FacID'], item])).values()]
@@ -1571,8 +1320,7 @@ class DotMapViewCombine extends React.Component {
             .style("opacity", 0);
         })
 
-        // Modification of custom tooltip code provided by Malcolm Maclean, "D3 Tips and Tricks" 
-        // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
+        
         .on("click", function (d) {
           //remove target map 
           self.legendcheckbox.current.checked = false
@@ -1586,22 +1334,11 @@ class DotMapViewCombine extends React.Component {
           self.statecode = null
           d3.selectAll("circle").style("opacity", () => self.dotcheckbox.current.checked ? 0.2 : 0).style("fill", "rgb(217,91,67)")
           d3.select(this).style("fill", "#abd9e9").style("opacity", .85)
-          // zoom.scale(1)
-          // self.facilityLine(self.FACID)
-          // self.props.setFACID(parseInt(d.target.__data__.FacID))
+          
           self.deathGeoJson()
           self.prepMark()
 
-          // self.updateLegend()
-
-
-          //update 
-          // div.transition()        
-          //      .duration(200)      
-          //      .style("opacity", .9);      
-          //      div.text(d.place)
-          //      .style("left", (d3.event.pageX) + "px")     
-          //      .style("top", (d3.event.pageY - 28) + "px");    
+            
         })
 
         const zoom = d3.zoom()
@@ -1622,69 +1359,7 @@ class DotMapViewCombine extends React.Component {
 
       svgElement.call(zoom);
 
-      // // fade out tooltip on mouse out               
-      // .on("mouseout", function (d) {
-      //   // div.transition()        
-      //   //    .duration(500)      
-      //   //    .style("opacity", 0);   
-      // });
-
-
-      //////////////////////read ftostate data
-
-
-      // The scale you use for bubble size
-
-      // var rsize = d3.scaleSqrt()
-      //   .domain([0, rMaxSize])  // What's in the data, let's say it is percentage
-      //   .range([0, rMaxSize])  // Size in pixel
-
-      // Add legend: circles
-      // var valuesToShow = [15000, 10000, 5000]
-      // var xCircle = 780
-      // var xLabel = 810
-      // var yCircle = 350
-      // svgElement
-      //   .selectAll("clegend")
-      //   .data(valuesToShow)
-      //   .enter()
-      //   .append("circle")
-      //   .attr("cx", xCircle)
-      //   .attr("cy", function (d) { return yCircle - d/rratio })
-      //   .attr("r", function (d) { return d/rratio })
-      //   .style("fill", "rgb(217,91,67)")
-      //   .attr("stroke", "black")
-
-      // // Add legend: segments
-      // svgElement
-      //   .selectAll("clegend")
-      //   .data(valuesToShow)
-      //   .enter()
-      //   .append("line")
-      //   .attr('x1', function (d) { return xCircle })
-      //   .attr("class", 'clegend_line')
-      //   .attr('x2', xLabel)
-      //   .attr('y1', function (d) { return yCircle - 2 * d/rratio })
-      //   .attr('y2', function (d) { return yCircle - 2 * d/rratio })
-      //   .attr('stroke', 'black')
-      //   .style('stroke-dasharray', ('2,2'))
-
-      // // Add legend: labels
-      // svgElement
-      //   .selectAll("clegend")
-      //   .data(valuesToShow)
-      //   .enter()
-      //   .append("text")
-      //   .attr("class", 'clegend_text')
-      //   .attr('x', xLabel)
-      //   .attr('y', function (d) { return yCircle - 2 * d/rratio })
-      //   .text(function (d) { return d  })
-      //   .style("font-size", 10)
-      //   .attr('alignment-baseline', 'middle')
-
-
-
-
+    
 
       this.updateLegend(this.color)
 
@@ -1789,10 +1464,6 @@ class DotMapViewCombine extends React.Component {
           }
         })
         .on("click", (d) => {
-          // this.props.setstatecode(d.target.__data__.properties.NAME)
-          // this.statecode = d.target.__data__.properties.NAME
-          // this.deathGeoJson()
-          // this.updateLegend()
 
         })
 
@@ -1819,16 +1490,6 @@ class DotMapViewCombine extends React.Component {
       // 'The overall statewide deaths'
 
       this.mtitle.innerText = ''
-
-
-      // + this.FACID.toString() 
-
-      // svgElement.append("text")
-      // .attr("x", '60vw' )
-      // .attr("y", '40vh')
-      // .attr("dy", ".35em")
-      // .style('font-size', '50px')
-      // .text((d) =>{ return 'Death in ' + this.statecode + 'caused by other states.'; });
 
 
       d3.csv(statedata).then((circledata) => {
@@ -1881,8 +1542,7 @@ class DotMapViewCombine extends React.Component {
               .style("opacity", 0);
           })
 
-          // Modification of custom tooltip code provided by Malcolm Maclean, "D3 Tips and Tricks" 
-          // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
+          
           .on("click", function (d) {
             //remove target map 
             self.legendcheckbox.current.checked = false
@@ -1896,42 +1556,14 @@ class DotMapViewCombine extends React.Component {
             self.statecode = null
             d3.selectAll("circle").style("opacity", () => self.dotcheckbox.current.checked ? 0.2 : 0).style("fill", "rgb(217,91,67)")
             d3.select(this).style("fill", "#abd9e9").style("opacity", .85)
-            // zoom.scale(1)
-            // self.facilityLine(self.FACID)
-            // self.props.setFACID(parseInt(d.target.__data__.FacID))
+            
             self.deathGeoJson()
             self.prepMark()
 
-            // self.updateLegend()
-
-
-            //update 
-            // div.transition()        
-            //      .duration(200)      
-            //      .style("opacity", .9);      
-            //      div.text(d.place)
-            //      .style("left", (d3.event.pageX) + "px")     
-            //      .style("top", (d3.event.pageY - 28) + "px");    
+           
           })
 
-        // // fade out tooltip on mouse out               
-        // .on("mouseout", function (d) {
-        //   // div.transition()        
-        //   //    .duration(500)      
-        //   //    .style("opacity", 0);   
-        // });
-
-
-        //////////////////////read ftostate data
-
-
-        // The scale you use for bubble size
-
-        // var rsize = d3.scaleSqrt()
-        //   .domain([0, rMaxSize])  // What's in the data, let's say it is percentage
-        //   .range([0, rMaxSize])  // Size in pixel
-
-        // Add legend: circles
+        
         var valuesToShow = [15000, 10000, 5000]
         var xCircle = 780
         var xLabel = 810
@@ -2005,25 +1637,6 @@ class DotMapViewCombine extends React.Component {
     d3.csv(landingstack).then((data) => {
 
 
-
-
-      // //filter data
-      // var filteredData = data.filter((d) => {
-
-      //   if ((d["state_facility"] == this.statecode)) {
-      //     return d;
-      //   }
-
-      // })
-
-
-
-      // const minco = parseFloat(d3.min(data, d => parseFloat(d.deaths_coef_2_all))) - 0.1
-      // const maxco = parseFloat(d3.max(data, d => parseFloat(d.deaths_coef_2_all))) + 0.1
-
-      // this.color.domain([0, maxco]); // setting the range of the input data 
-
-      // extract series data:
       const statenames = data.map(d => {
         return d.state_zip
       })
@@ -2078,14 +1691,7 @@ class DotMapViewCombine extends React.Component {
         return parseFloat(second.sum) - parseFloat(first.sum);
       });
 
-      // if(seriesdata[0]){
-      //   this.color.domain([0, seriesdata[0].sum]);
-      // }
-      //   seriesdata.forEach(sdata=>{
-      //     sdata.itemStyle.color = this.color(sdata.sum)
-          
-      //   })
-
+     
       var legenddata = seriesdata.map((d) => {
         return d.name
       })
@@ -2094,29 +1700,11 @@ class DotMapViewCombine extends React.Component {
         return parseFloat(d.sum)
       }))
 
-      // if (seriesdata.length > 0) {
-      //   seriesdata[0].markPoint = markDict
-      // }
-
-
+      
 
       this.lineoption = {
 
-        // tooltip: {
-        //   trigger: 'axis',
-        //   // textStyle:{fontSize : 5},
-        //   // formatter: (params)=>{
-        //   //   return params.sum
-        //   // },
-        //   padding: 2,
-        //   position: [10, 10],
-        //   axisPointer: {
-        //     type: 'none',
-        //     label: {
-        //       backgroundColor: '#6a7985'
-        //     }
-        //   }
-        // },
+       
         title: {
           text:Math.ceil( totalDeath / 10) * 10 + ' Deaths',
 
@@ -2146,18 +1734,7 @@ class DotMapViewCombine extends React.Component {
           data: legenddata
         },
 
-        // tooltip: {
-        //   trigger: 'axis',
-        //   axisPointer: {
-
-        //     label: {
-        //       backgroundColor: '#6a7985'
-        //     }
-        //   }
-        // },
-        // legend: {
-        //   data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
-        // },
+        
 
         grid: {
           left: '3%',
@@ -2168,36 +1745,7 @@ class DotMapViewCombine extends React.Component {
         xAxis: [
           {
             type: 'category',
-            // axisLabel:{interval:0,
-            //   // fontSize: 
-            // }  ,
-            // axisPointer: {
-            //   value: this.props.year,
-            //   snap: true,
-            //   lineStyle: {
-            //     color: 'rgb(100,100,100)',
-            //     width: 3
-            //   },
-            //   label: {
-            //     show: false,
-            //     formatter: (params) => {
-            //       console.log(params.value)
-            //       if (params.value !== this.year) {
-            //         // ...
-            //         this.year = params.value
-            //         // this.props.setyear(params.value)
-            //         //...
-            //       }
-            //       return null;
-            //     }
-
-            //   },
-            //   handle: {
-            //     show: false,
-            //     color: 'rgb(100,100,100)',
-            //     size: 20,
-            //   }
-            // },
+            
             boundaryGap: false,
             data: d3.range(1999, 2021, 1)
           }
@@ -2213,24 +1761,14 @@ class DotMapViewCombine extends React.Component {
       };
 
 
-      // var chartDom = document.getElementById('linestack');
-      // var myChart = echarts.init(chartDom);
-      // myChart.setOption(this.lineoption);
-
-      // var chartDom = document.getElementById('linestack2');
-
+      
       this.myChart.setOption(this.lineoption, {
         notMerge: true
 
       });
 
       this.myChart.getZr().on('mouseover', (params) => {
-        // set a small delay before continuing to ensure that series highlight/emphasis-state has already taken effect within Echarts. A single tick is not enough.
-        // let zrTimeout = setTimeout(() => {
-
-
-        // get the polyline/polygon drawing element from the ZRender component which is servicing a series and is in emphasis/highlight state
-        const seriesPolyShape = this.myChart.getZr().storage._displayList.find(d => d.currentStates[0] === "emphasis" && d.parent?.parent?.__ecComponentInfo?.mainType === "series")
+      const seriesPolyShape = this.myChart.getZr().storage._displayList.find(d => d.currentStates[0] === "emphasis" && d.parent?.parent?.__ecComponentInfo?.mainType === "series")
 
         // get the series index
 
@@ -2242,8 +1780,7 @@ class DotMapViewCombine extends React.Component {
             return
           }
         });
-        // seriesPolyShape?.parent?.parent?.__ecComponentInfo?.index
-        // params.target.__ec_inner_7.seriesIndex
+        
 
         if ((typeof (highlightedSeriesIndex) === "undefined")) {
           this.dottooltip.transition()
@@ -2408,134 +1945,10 @@ class DotMapViewCombine extends React.Component {
       .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")")
       .call(legendaxis);
 
-    // svg
-    // .selectAll("legend2_title")
-    // .data(['Statewide Death Coefficient'])
-    // .enter()
-    // .append("text")
-    // // .attr("class", 'legend_text')
-    // .attr("transform", "translate(" + margin.left + "," + (margin.top ) + ")")
-    // .text(function (d) { return d  })
-    // .style("font-size", 10)
-    // .attr('alignment-baseline', 'middle')
+   
   }
 
-  facilityLine(FACID) {
-    // set the dimensions and margins of the graph
-    var margin = { top: 0, right: 30, bottom: 30, left: 100 },
-      width = 900 - margin.left - margin.right,
-      height = 200 - margin.top - margin.bottom;
-
-    // d3.select('#facilityline').selectAll("*").remove()
-
-    // append the svg object to the body of the page
-
-    const svgp = d3.select(this.flsvg)
-
-
-
-
-    svgp.selectAll("*").remove()
-
-    const svg = svgp.append("g")
-      .attr("transform",
-        "translate(" + margin.left + "," + margin.top + ")");
-
-
-    // svgElement.selectAll("circle")
-    //       .data(f2sdata)
-    //       .enter()
-    //       .append("circle")
-    //       .attr("cx", 
-
-
-
-
-    // var svg = d3.select("#facilityline")
-    //   .append("svg")
-    //   .attr("width", width + margin.left + margin.right)
-    //   .attr("height", height + margin.top + margin.bottom)
-    //   .append("g")
-    //   .attr("transform",
-    //     "translate(" + margin.left + "," + margin.top + ")");
-
-    //Read the data
-    d3.csv(facility_line_data).then((fldata) => {
-
-      var filteredData = fldata.filter((d) => {
-
-        if (parseInt(d["FacID"]) === FACID) {
-          return d;
-        }
-
-      })
-
-      // Add X axis --> it is a date format
-      const minf = d3.min(filteredData, d => parseFloat(d.deaths_coef_1)) - 0.1
-      const maxf = d3.max(filteredData, d => parseFloat(d.deaths_coef_3)) + 0.1
-
-      var x = d3.scalePoint()
-        .domain(d3.range(1999, 2021, 1))
-        .range([0, width]);
-
-      // svgElement.selectAll("path")
-      // .data(json.features)
-      // .enter()
-      // .append("path")
-      // .attr("d", this.path)
-      // .style("stroke", (d) => {
-      //   if (d.properties.NAME === this.statecode) {
-      //     return "rgb(100,100,100)"
-      //   } else {
-      //     return "#fff"
-      //   }
-
-      // })
-
-
-      svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
-
-      // Add Y axis
-      var y = d3.scaleLinear()
-        .domain([0, maxf])
-        .range([height, 0]);
-
-      svg.append("g")
-        .call(d3.axisLeft(y));
-
-      // Show confidence interval
-      // svg.append("path")
-      //   .datum()
-      console.log(minf, maxf)
-      svg.append("path")
-        .datum(filteredData)
-        .attr("fill", "#cce5df")
-        .attr("stroke", "none")
-        .attr("d", d3.area()
-          .x(function (d) { return x(parseInt(d.year)) })
-          .y0(function (d) { return y(parseFloat(d.deaths_coef_1)) })
-          .y1(function (d) { return y(parseFloat(d.deaths_coef_3)) })
-        )
-
-      // Add the line
-
-      svg
-        .append("path")
-        .datum(filteredData)
-        .attr("fill", "none")
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 1.5)
-        .attr("d", d3.line()
-          .x(function (d) { return x(parseInt(d.year)) })
-          .y(function (d) { return y(parseFloat(d.deaths_coef_2)) })
-        )
-    })
-
-  }
-
+  
   openNav() {
     document.getElementById("mySidepanel").style.width = "300px";
   }
@@ -2545,31 +1958,13 @@ class DotMapViewCombine extends React.Component {
   }
 
   render() {
-    // const {year, statecode} = this.state;
-    // this.deathGeoJson()
-    // this.stackLine()
-
-    // this.facilityLine(this.flsvg)
-
-    // function onlyUnique(value, index, self) {
-    //   return self.indexOf(value) === index;
-    // }
+    
 
     var facidstr = JSON.stringify(facIDname);
     var facidjson = JSON.parse(facidstr);
     facidjson.sort((a, b) => (a.label > b.label) ? 1 : -1)
 
-    // var filterfacidjson = facidjson.filter((d) => {
-
-    //   if(d.value[0] === 'Alabama') {
-    //     return d;
-    //   }
-
-    // })
-
-    // const arrayUniqueByKey = [...new Map(facidjson.map(item =>
-    //   [item['label'], item])).values()];
-
+    
 
 
     console.log(facidjson)
@@ -2598,8 +1993,7 @@ class DotMapViewCombine extends React.Component {
 
             <div style={{ zIndex:10000,width: '150px', height: '20px', position: 'absolute', top: '13vh', left: '35vw' }}>
               <Select
-                // noOptionsMessage={() => 'Select a state to show...'}
-                // LoadingMessage = {()=> 'Select a state to show...'}
+                
 
                 placeholder='Explore by state'
                 value={this.statecode}
@@ -2630,16 +2024,14 @@ class DotMapViewCombine extends React.Component {
               </label>
             </div>
             <svg
-              // width={this.width}
-              // height={this.height}
+             
               className="dotmapview"
               viewBox="0 0 1000 500"
               style={{ position: 'absolute', top: '18vh', left: '2vw', width: '50vw', height: 'auto' }}
 
               ref={this.svg}
-            // ref = {ref}
+            
             >
-              {/* <rect x="5vw" y="15" width="140vh" height="75vh" style={{"position": "absolute","fill": "none","top": "18vh","left": "2vw","stroke": '#f1aca5',"stroke-width":"5", "fill-opacity":"0.1", "stroke-opacity":"0.9"}}></rect> */}
 
 
 
@@ -2647,19 +2039,16 @@ class DotMapViewCombine extends React.Component {
             <h3 style={{ position: 'absolute', top: '66vh' }}> <span ref={input => (this.mtitle = input)}></span> </h3>
 
             <svg
-              // width={this.width}
-              // height={this.height}
+              
               className="mapview"
               id='map'
-              // preserveAspectRatio ="xMinYMin meet"
+              
               viewBox="0 0 2000 500"
               style={{ position: 'absolute', top: '70vh', left: '2vw', width: '50vw', height: 'auto' }}
               ref={input => (this.targetsvg = input)}
-            // ref = {ref}
+            
             >
-                            {/* <rect x="5vw" y="15" width="140vh" height="75vh" style={{"position": "absolute","fill": "none","top": "18vh","left": "2vw","stroke": '#f1aca5',"stroke-width":"5", "fill-opacity":"0.1", "stroke-opacity":"0.9"}}></rect> */}
-
-
+                           
 
 
             </svg>
@@ -2695,9 +2084,7 @@ class DotMapViewCombine extends React.Component {
 
 
               <svg
-                // width={800}
-                // height={600}
-                // className="facilityline"
+                
                 viewBox="0 0 1000 500"
                 style={{ position: 'absolute', top: '80vh', left: '50vw', width: '50vw', height: 'auto' }}
                 ref={input => (this.flsvg = input)}
@@ -2709,9 +2096,7 @@ class DotMapViewCombine extends React.Component {
 
 
           </div>
-          {/* <DotMapViewCombine year = {this.year} statecode = {this.statecode} setFACID={FACID => this.setFACID(FACID)} setstatecode={statecode => this.setstatecode(statecode)}/> */}
-          {/* <MapView year = {this.year} statecode = {this.statecode} setyear={year => this.setyear(year)} setstatecode={statecode => this.setstatecode(statecode)}/> */}
-
+          
         </div>
         <div>          <span style={{ color: 'black', position: 'absolute', top: '68vh', left: '38vw', fontSize: '10px' }}> Statewide Deaths </span>
         </div>
@@ -2731,7 +2116,6 @@ class DotMapViewCombine extends React.Component {
               </label>
             </div>
             <div style={{ position: "relative", float: "left", left: "10vw" }}>
-              {/* <span style={{ color: '#f1aca5', position: 'relative', top: '5px', left: '155px', fontSize: '15px' }}>unselect all</span> */}
               <span style={{ color: '#f1aca5', position: 'relative', top: '5px', right: '15px', fontSize: '15px' }}>unselect all</span>
               <label class="switch" >
                 <input type="checkbox" onChange={this.legendtoggle} defaultChecked={false} ref={this.legendcheckbox} />
@@ -2742,7 +2126,6 @@ class DotMapViewCombine extends React.Component {
           
             
           
-          {/* <StackLine FACID={this.state.FACID} /> */}
         </div>
       </div>
 
