@@ -13,18 +13,19 @@ import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import $ from 'jquery';
 
-import statedata from "../data/newdata/facility_to_state_sum_all_fullname.csv";  // facility to state data
 import statejson from "../data/gz_2010_us_040_00_500k.json"
 import facIDname from "../data/facid_name.json"
 import facDict from "../data/facid_name_dict2.json"
+
+import statedata from "../data/newdata1/facility_to_state_sum_all_fullname.csv";  // facility to state data
 import facility_line_data from "../data/newdata/facility_to_state_year.csv"
-import stateselectdata from "../data/newdata/state_to_state_sum_all_fullname.csv";  // state to state data
-import stackdata from "../data/newdata/facility_to_state_year_sum2_fullname.csv";  // facility stackline chart data
-import facility_shut from "../data/new_facility_shut_count.csv"
-import facility_scrub from "../data/new_facility_scrubbed_count.csv"
-import statestack from "../data/newdata/pm25_facility_state_sum_fullname.csv"  // state stackline chart data
-import landingstate from "../data/newdata/landing_state_overall.csv"
-import landingstack from "../data/newdata/landing_state_overall_year.csv"
+import stateselectdata from "../data/newdata1/state_to_state_sum_all_fullname.csv";  // state to state data
+import stackdata from "../data/newdata1/facility_to_state_year_sum2_fullname.csv";  // facility stackline chart data
+import facility_shut from "../data/newdata1/new_facility_shut_count.csv"
+import facility_scrub from "../data/newdata1/new_facility_scrubbed_count.csv"
+import statestack from "../data/newdata1/pm25_facility_state_sum_fullname.csv"  // state stackline chart data
+import landingstate from "../data/newdata1/landing_state_overall.csv"
+import landingstack from "../data/newdata1/landing_state_overall_year.csv"
 import { timeHours } from "d3";
 
 
@@ -443,6 +444,14 @@ class DotMapViewCombine extends React.Component {
             return parseFloat(d.deaths_coef_2)
           })
 
+          var yearstateto1 = stateto.map((d) => {
+            return parseFloat(d.deaths_coef_1)
+          })
+
+          var yearstateto3 = stateto.map((d) => {
+            return parseFloat(d.deaths_coef_3)
+          })
+
           seriesdata.push({
 
             name: state,
@@ -455,7 +464,9 @@ class DotMapViewCombine extends React.Component {
                 // parseFloat(yearstateto[0]))  //change later
             },
             data: yearstateto,
-            sum: d3.sum(yearstateto)
+            sum: d3.sum(yearstateto),
+            sum1: d3.sum(yearstateto1),
+            sum3: d3.sum(yearstateto3)
 
 
           })
@@ -480,6 +491,14 @@ class DotMapViewCombine extends React.Component {
 
         var totalDeath = d3.sum(seriesdata.map((d) => {
           return parseFloat(d.sum)
+        }))
+
+        var totalDeath1 = d3.sum(seriesdata.map((d) => {
+          return parseFloat(d.sum1)
+        }))
+
+        var totalDeath3 = d3.sum(seriesdata.map((d) => {
+          return parseFloat(d.sum3)
         }))
 
 
@@ -520,7 +539,9 @@ class DotMapViewCombine extends React.Component {
             right: '5%',
             top: '57%'
           },{
-          text:Math.ceil( totalDeath / 10) * 10 + ' Deaths',
+          text:Math.ceil( totalDeath / 10) * 10 + ' deaths' + " (CI: " + Math.ceil( totalDeath1 / 10) * 10 + '-' + Math.ceil( totalDeath3 / 10) * 10 + ")"
+
+          ,
 
 
           textStyle: {
@@ -670,6 +691,8 @@ class DotMapViewCombine extends React.Component {
 
             var series = this.myChart.getOption().series;
             var sumvalue = series[highlightedSeriesIndex].sum
+            var sumvalue1 = series[highlightedSeriesIndex].sum1
+            var sumvalue3 = series[highlightedSeriesIndex].sum3
             var statename = series[highlightedSeriesIndex].name
 
 
@@ -679,7 +702,9 @@ class DotMapViewCombine extends React.Component {
             this.dottooltip.transition()
               .duration(200)
               .style("opacity", .9);
-            this.dottooltip.text('Associated with ' + Math.ceil(sumvalue / 10) * 10 +   ' deaths in ' + statename
+            this.dottooltip.text('Associated with ' + Math.ceil(sumvalue / 10) * 10 +   ' deaths in ' + statename +
+            " (CI: " + Math.ceil(sumvalue1 / 10) * 10 + "-" + Math.ceil(sumvalue3 / 10) * 10 + ")"
+
             )
               .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw')
               .style("top", (params.offsetY+50) + "px");
@@ -731,7 +756,7 @@ class DotMapViewCombine extends React.Component {
             )
         })
 
-        this.ltitle.innerText = "Deaths associated with " + this.fnameDict[parseInt(this.FACID)][0] + " Facility" +" (" + this.fnameDict[parseInt(this.FACID)][1] + ")"
+        this.ltitle.innerText = "Deaths associated with the " + this.fnameDict[parseInt(this.FACID)][0] + " Facility" +" (" + this.fnameDict[parseInt(this.FACID)][1] + ")"
         
         $('#loading-image').hide();
 
@@ -781,6 +806,12 @@ class DotMapViewCombine extends React.Component {
           var yearstateto = stateto.map((d) => {
             return parseFloat(d.deaths_coef_2)
           })
+          var yearstateto1 = stateto.map((d) => {
+            return parseFloat(d.deaths_coef_1)
+          })
+          var yearstateto3 = stateto.map((d) => {
+            return parseFloat(d.deaths_coef_3)
+          })
 
           seriesdata.push({
 
@@ -793,7 +824,9 @@ class DotMapViewCombine extends React.Component {
               color: this.color(d3.sum(yearstateto))  //change later
             },
             data: yearstateto,
-            sum: d3.sum(yearstateto)
+            sum: d3.sum(yearstateto),
+            sum1: d3.sum(yearstateto1),
+            sum3: d3.sum(yearstateto3)
 
 
           })
@@ -818,6 +851,12 @@ class DotMapViewCombine extends React.Component {
         var totalDeath = d3.sum(seriesdata.map((d) => {
           return parseFloat(d.sum)
         }))
+        var totalDeath1 = d3.sum(seriesdata.map((d) => {
+          return parseFloat(d.sum1)
+        }))
+        var totalDeath3 = d3.sum(seriesdata.map((d) => {
+          return parseFloat(d.sum3)
+        }))
 
 
 
@@ -825,7 +864,7 @@ class DotMapViewCombine extends React.Component {
 
           
           title: {
-            text:Math.ceil( totalDeath / 10) * 10 + ' Deaths',
+            text:Math.ceil( totalDeath / 10) * 10 + ' deaths' +" (CI: " + Math.ceil( totalDeath1 / 10) * 10 + '-' + Math.ceil( totalDeath3 / 10) * 10 + ")",
   
   
             textStyle: {
@@ -1211,7 +1250,7 @@ class DotMapViewCombine extends React.Component {
       const svgElement = d3.select(this.svg.current)
       const g = svgElement.append("g").attr("id", "statepath")
       svgElement.select("#statepath").selectAll("path").remove()
-      svgElement.selectAll(".facilitydot").remove()
+      // svgElement.selectAll(".facilitydot").remove()
 
 
 
@@ -1257,7 +1296,7 @@ class DotMapViewCombine extends React.Component {
 
       
 
-      this.ltitle.innerText = "Deaths associated with " + this.fnameDict[parseInt(this.FACID)][0] + " Facility" +" (" + this.fnameDict[parseInt(this.FACID)][1] + ")"
+      this.ltitle.innerText = "Deaths associated with the " + this.fnameDict[parseInt(this.FACID)][0] + " Facility" +" (" + this.fnameDict[parseInt(this.FACID)][1] + ")"
       
 
       var uniFilterData = [...new Map(data.map(item =>
@@ -1269,77 +1308,79 @@ class DotMapViewCombine extends React.Component {
       var rratio = 800
       var rMaxSize = uniFilterData[0].deaths_coef_2_all
 
-      svgElement.selectAll("circle")
-        .data(uniFilterData)
-        .enter()
-        .append("circle")
-        .attr('class', 'facilitydot')
-        .attr("cx", function (d) {
-          return self.projection([d.lon, d.lat])[0];
-        })
-        .attr("cy", function (d) {
-          return self.projection([d.lon, d.lat])[1];
-        })
-        .attr("r", function (d) {
-          return d.deaths_coef_2_all / rratio;
-        })
-        .style("stroke", "gray")
-        .style("fill", d => {
-          if (parseInt(d["FacID"]) === this.FACID) {
-            return "#abd9e9"
-          } else {
-            return "rgb(217,91,67)"
-          }
-        })
-        .style("opacity", (d) => {
-          if (parseInt(d["FacID"]) === this.FACID) {
-            return 0.85
-          } else {
-            return this.dotcheckbox.current.checked ? 0.2 : 0
-          }
-          })
-        .on("mouseover", (event, d) => {
-          if(this.dotcheckbox.current.checked){
-            this.dottooltip.transition()
-            .duration(200)
-            .style("opacity", .9);
-            this.dottooltip.text("Total deaths from " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 )
-            .style("left", (event.pageX) + "px")
-            .style("top", (event.pageY - 28) + "px");
-          }else{
-            this.dottooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
-          }
+      console.log(uniFilterData.length)
+
+      // svgElement.selectAll("circle")
+      //   .data(uniFilterData)
+      //   .enter()
+      //   .append("circle")
+      //   .attr('class', 'facilitydot')
+      //   .attr("cx", function (d) {
+      //     return self.projection([d.lon, d.lat])[0];
+      //   })
+      //   .attr("cy", function (d) {
+      //     return self.projection([d.lon, d.lat])[1];
+      //   })
+      //   .attr("r", function (d) {
+      //     return parseFloat(d.deaths_coef_2_all) / rratio;
+      //   })
+      //   .style("stroke", "gray")
+      //   .style("fill", d => {
+      //     if (parseInt(d["FacID"]) === this.FACID) {
+      //       return "#abd9e9"
+      //     } else {
+      //       return "rgb(217,91,67)"
+      //     }
+      //   })
+      //   .style("opacity", (d) => {
+      //     if (parseInt(d["FacID"]) === this.FACID) {
+      //       return 0.85
+      //     } else {
+      //       return this.dotcheckbox.current.checked ? 0.2 : 0
+      //     }
+      //     })
+      //   .on("mouseover", (event, d) => {
+      //     if(this.dotcheckbox.current.checked){
+      //       this.dottooltip.transition()
+      //       .duration(200)
+      //       .style("opacity", .9);
+      //       this.dottooltip.text("Total deaths from " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 + " (CI: " +Math.ceil(d.deaths_coef_1_all / 10) * 10 +"-"+ Math.ceil(d.deaths_coef_3_all / 10) * 10 +")")
+      //       .style("left", (event.pageX) + "px")
+      //       .style("top", (event.pageY - 28) + "px");
+      //     }else{
+      //       this.dottooltip.transition()
+      //       .duration(500)
+      //       .style("opacity", 0);
+      //     }
           
-        })
-        // fade out tooltip on mouse out               
-        .on("mouseout", (d) => {
-          this.dottooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
-        })
+      //   })
+      //   // fade out tooltip on mouse out               
+      //   .on("mouseout", (d) => {
+      //     this.dottooltip.transition()
+      //       .duration(500)
+      //       .style("opacity", 0);
+      //   })
 
         
-        .on("click", function (d) {
-          //remove target map 
-          self.legendcheckbox.current.checked = false
-          const targetsvgElement = d3.select(self.targetsvg)
-          // targetsvgElement.append("g").attr("id", "tstatepath")
-          targetsvgElement.select("#tstatepath").selectAll("path").remove()
-          self.mtitle.innerText = ''
+      //   .on("click", function (d) {
+      //     //remove target map 
+      //     self.legendcheckbox.current.checked = false
+      //     const targetsvgElement = d3.select(self.targetsvg)
+      //     // targetsvgElement.append("g").attr("id", "tstatepath")
+      //     targetsvgElement.select("#tstatepath").selectAll("path").remove()
+      //     self.mtitle.innerText = ''
 
-          self.FACID = parseInt(d.target.__data__.FacID)
+      //     self.FACID = parseInt(d.target.__data__.FacID)
 
-          self.statecode = null
-          d3.selectAll("circle").style("opacity", () => self.dotcheckbox.current.checked ? 0.2 : 0).style("fill", "rgb(217,91,67)")
-          d3.select(this).style("fill", "#abd9e9").style("opacity", .85)
+      //     self.statecode = null
+      //     d3.selectAll("circle").style("opacity", () => self.dotcheckbox.current.checked ? 0.2 : 0).style("fill", "rgb(217,91,67)")
+      //     d3.select(this).style("fill", "#abd9e9").style("opacity", .85)
           
-          self.deathGeoJson()
-          self.prepMark()
+      //     self.deathGeoJson()
+      //     self.prepMark()
 
             
-        })
+      //   })
 
         const zoom = d3.zoom()
         .scaleExtent([1, 8])
@@ -1503,6 +1544,8 @@ class DotMapViewCombine extends React.Component {
         var rratio = 800
         var rMaxSize = uniFilterData[0].deaths_coef_2_all
 
+        console.log(uniFilterData.length)
+
         svgElement.selectAll("circle")
           .data(uniFilterData)
           .enter()
@@ -1515,7 +1558,7 @@ class DotMapViewCombine extends React.Component {
             return self.projection([d.lon, d.lat])[1];
           })
           .attr("r", function (d) {
-            return d.deaths_coef_2_all / rratio;
+            return parseFloat(d.deaths_coef_2_all) / rratio;
           })
           .style("stroke", "gray")
           .style("fill", d => {
@@ -1530,7 +1573,7 @@ class DotMapViewCombine extends React.Component {
             this.dottooltip.transition()
               .duration(200)
               .style("opacity", .9);
-          this.dottooltip.text("Total deaths from " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 )
+          this.dottooltip.text("Total deaths from " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 + " (CI: " +Math.ceil(d.deaths_coef_1_all / 10) * 10 +"-"+ Math.ceil(d.deaths_coef_3_all / 10) * 10 +")" )
               .style("left", (event.pageX) + "px")
               .style("top", (event.pageY - 28) + "px");
             
@@ -1666,6 +1709,14 @@ class DotMapViewCombine extends React.Component {
           return parseFloat(d.deaths_coef_2_all)
         })
 
+        var yearstateto1 = stateto.map((d) => {
+          return parseFloat(d.deaths_coef_1)
+        })
+
+        var yearstateto3 = stateto.map((d) => {
+          return parseFloat(d.deaths_coef_3)
+        })
+
         seriesdata.push({
 
           name: state,
@@ -1677,7 +1728,9 @@ class DotMapViewCombine extends React.Component {
             color: this.color(d3.sum(yearstateto))  //change later
           },
           data: yearstateto,
-          sum: d3.sum(yearstateto)
+          sum: d3.sum(yearstateto),
+          sum1: d3.sum(yearstateto1),
+          sum3: d3.sum(yearstateto3)
 
 
         })
@@ -1700,13 +1753,21 @@ class DotMapViewCombine extends React.Component {
         return parseFloat(d.sum)
       }))
 
+      var totalDeath1 = d3.sum(seriesdata.map((d) => {
+        return parseFloat(d.sum1)
+      }))
+
+      var totalDeath3 = d3.sum(seriesdata.map((d) => {
+        return parseFloat(d.sum3)
+      }))
+
       
 
       this.lineoption = {
 
        
         title: {
-          text:Math.ceil( totalDeath / 10) * 10 + ' Deaths',
+          text: Math.ceil( totalDeath / 10) * 10 + ' deaths' +" (CI: " + Math.ceil( totalDeath1 / 10) * 10 + '-' + Math.ceil( totalDeath3 / 10) * 10 + ")",
 
 
           textStyle: {
@@ -1714,7 +1775,7 @@ class DotMapViewCombine extends React.Component {
             fontSize: 10,
             lineHeight: 20
           },
-          right: '5%',
+          right: '8%',
           top: '70%'
         },
         legend: {
@@ -1808,6 +1869,8 @@ class DotMapViewCombine extends React.Component {
 
           var series = this.myChart.getOption().series;
           var sumvalue = series[highlightedSeriesIndex].sum
+          var sumvalue1 = series[highlightedSeriesIndex].sum1
+          var sumvalue3 = series[highlightedSeriesIndex].sum3
           var statename = series[highlightedSeriesIndex].name
 
 
@@ -1817,7 +1880,8 @@ class DotMapViewCombine extends React.Component {
           this.dottooltip.transition()
             .duration(200)
             .style("opacity", .9);
-          this.dottooltip.text('Associated with ' + Math.ceil(sumvalue / 10) * 10 +   ' deaths in ' + statename
+          this.dottooltip.text('Associated with ' + Math.ceil(sumvalue / 10) * 10 +   ' deaths in ' + statename +
+          " (CI: " + Math.ceil(sumvalue1 / 10) * 10 + "-" + Math.ceil(sumvalue3 / 10) * 10 + ")"
             )
             .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw')
             .style("top", (params.offsetY+50) + "px");
@@ -2067,7 +2131,7 @@ class DotMapViewCombine extends React.Component {
               <p >Data and methods</p>
               <p className="insidep"> Facility information is taken from <a target="_blank" className="insidea" href="https://campd.epa.gov/">EPA’s Clean Air Markets Program Data </a> (https://campd.epa.gov/) .</p>
               <p className="insidep"> Population exposure is derived from each facility’s sulfur dioxide (SO<sub>2</sub>) emissions, atmospheric transport and dispersion, and chemical conversion to fine particulate matter (PM<sub>2.5</sub>). Other exposures and impacts (e.g., climate impacts) are not considered.</p>
-              <p className="insidep"> Deaths correspond to excess mortalities in the US Medicare population.</p>
+              <p className="insidep"> Deaths correspond to excess mortalities in the US Medicare population. Values in parentheses represent 95% confidence intervals.</p>
               <p className="insidep"> More detail on the methods is available here:</p>
               <p className="insidep"> Lucas Henneman, Christine Choirat, Irene Dedoussi, Francesca Dominici, Jessica Roberts, Corwin Zigler. Coal’s toll: 22 years of Medicare deaths attributable to electricity generation. <i>Under review</i>.</p>
               
