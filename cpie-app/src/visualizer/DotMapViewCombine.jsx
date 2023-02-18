@@ -1009,14 +1009,12 @@ class DotMapViewCombine extends React.Component {
 
       const svgElement = d3.select(this.svg.current)
       const g = svgElement.append("g").attr("id", "statepath")
-      svgElement.select("#statepath").selectAll("path").remove()
+      // svgElement.select("#statepath").selectAll("path").remove()
 
 
 
       svgElement.select("#statepath").selectAll("path")
         .data(json.features)
-        .enter()
-        .append("path")
         .attr("d", this.path)
         .style("stroke", (d) => {
           if (d.properties.NAME === this.statecode) {
@@ -1067,7 +1065,7 @@ class DotMapViewCombine extends React.Component {
             .attr('transform', event.transform);
         });
 
-      svgElement.call(zoom);
+      // svgElement.call(zoom);
 
 
       // update target map
@@ -1249,7 +1247,7 @@ class DotMapViewCombine extends React.Component {
 
       const svgElement = d3.select(this.svg.current)
       const g = svgElement.append("g").attr("id", "statepath")
-      svgElement.select("#statepath").selectAll("path").remove()
+      // svgElement.select("#statepath").selectAll("path").remove()
       // svgElement.selectAll(".facilitydot").remove()
 
 
@@ -1257,8 +1255,6 @@ class DotMapViewCombine extends React.Component {
 
       svgElement.select("#statepath").selectAll("path")
         .data(json.features)
-        .enter()
-        .append("path")
         .attr("d", this.path)
         .style("stroke", (d) => {
           if (d.properties.NAME === this.statecode) {
@@ -1398,7 +1394,7 @@ class DotMapViewCombine extends React.Component {
           .attr('transform', event.transform);
         });
 
-      svgElement.call(zoom);
+      // svgElement.call(zoom);
 
     
 
@@ -1508,23 +1504,7 @@ class DotMapViewCombine extends React.Component {
 
         })
 
-      const zoom = d3.zoom()
-        .scaleExtent([1, 8])
-        .on('zoom', (event) => {
-          svgElement.select("#statepath")
-            .selectAll('path') // To prevent stroke width from scaling
-            .attr('transform', event.transform);
-          svgElement.selectAll("circle")
-            .attr('transform', event.transform);
-          svgElement
-          .selectAll("line")
-          .attr('transform', event.transform);
-          svgElement
-          .selectAll("text")
-          .attr('transform', event.transform);
-        });
-
-      svgElement.call(zoom);
+      
       
       var pm25 = "2.5"
       this.ltitle.innerHTML  = "Deaths attributable to coal PM" + pm25.sub()
@@ -1605,6 +1585,25 @@ class DotMapViewCombine extends React.Component {
 
            
           })
+
+
+          const zoom = d3.zoom()
+          .scaleExtent([1, 8])
+          .on('zoom', (event) => {
+            svgElement.select("#statepath")
+              .selectAll('path') // To prevent stroke width from scaling
+              .attr('transform', event.transform);
+            svgElement.selectAll("circle")
+              .attr('transform', event.transform);
+            svgElement
+            .selectAll("line")
+            .attr('transform', event.transform);
+            svgElement
+            .selectAll("text")
+            .attr('transform', event.transform);
+          });
+  
+        svgElement.call(zoom); 
 
         
         var valuesToShow = [15000, 10000, 5000]
