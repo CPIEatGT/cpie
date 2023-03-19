@@ -23,6 +23,7 @@ import stateselectdata from "../data/newdata1/state_to_state_sum_all_fullname.cs
 import stackdata from "../data/newdata1/facility_to_state_year_sum2_fullname.csv";  // facility stackline chart data
 import facility_shut from "../data/newdata1/new_facility_shut_count.csv"
 import facility_scrub from "../data/newdata1/new_facility_scrubbed_count.csv"
+import facility_all from "../data/newdata1/new_facility_all_count.csv"
 import statestack from "../data/newdata1/pm25_facility_state_sum_fullname.csv"  // state stackline chart data
 import landingstate from "../data/newdata1/landing_state_overall.csv"
 import landingstack from "../data/newdata1/landing_state_overall_year.csv"
@@ -267,7 +268,9 @@ class DotMapViewCombine extends React.Component {
   prepMark() {
     d3.csv(facility_shut).then((shutdata) => {
 
-      var sumunit = 0
+      // var sumunit = 0
+      
+    
       var sumshutdata = shutdata.filter((d) => {
 
         if ((d["FacID"] == this.FACID)) {
@@ -275,7 +278,7 @@ class DotMapViewCombine extends React.Component {
         }
 
       })
-      sumunit += sumshutdata.reduce((total, obj) => parseInt(obj.uID) + total, 0)
+      // sumunit += sumshutdata.reduce((total, obj) => parseInt(obj.uID) + total, 0)
 
 
       var shutfilteredData = sumshutdata.filter((d) => {
@@ -326,7 +329,7 @@ class DotMapViewCombine extends React.Component {
 
         })
 
-        sumunit += sumscrubdata.reduce((total, obj) => parseInt(obj.uID) + total, 0)
+        // sumunit += sumscrubdata.reduce((total, obj) => parseInt(obj.uID) + total, 0)
 
         var scrubfilteredData = sumscrubdata.filter((d) => {
 
@@ -363,23 +366,40 @@ class DotMapViewCombine extends React.Component {
           )
         })
 
-        var markDict = [{
-          symbolSize: 40,
-          //   symbol:'circle',
-          //  symbolOffset:[-10,20],
-          itemStyle: {
-            color: "#fef0d9"
-          },
-          symbolRotate: 180,
-          symbolOffset: [0, 20],
-          data: marklist
-        }, {
-          sum: sumunit
-        }]
-        // console.log(markDict)
+        
 
+        d3.csv(facility_all).then((facilitydata) => {
+          var sumdata = facilitydata.filter((d) => {
+  
+            if ((d["FacID"] == this.FACID)) {
+              return d;
+            }
+    
+          })
+  
+          var sumunit = sumdata.reduce((total, obj) => parseInt(obj.uID) + total, 0)
 
-        this.stackLine(markDict)
+          var markDict = [{
+            symbolSize: 40,
+            //   symbol:'circle',
+            //  symbolOffset:[-10,20],
+            itemStyle: {
+              color: "#fef0d9"
+            },
+            symbolRotate: 180,
+            symbolOffset: [0, 20],
+            data: marklist
+          }, {
+            sum: sumunit
+          }]
+          // console.log(markDict)
+  
+  
+          this.stackLine(markDict)
+  
+        })
+
+        
 
       })
 
