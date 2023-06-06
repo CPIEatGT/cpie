@@ -17,16 +17,16 @@ import statejson from "../data/gz_2010_us_040_00_500k.json"
 import facIDname from "../data/facid_name.json"
 import facDict from "../data/facid_name_dict2.json"
 
-import statedata from "../data/newdata1/facility_to_state_sum_all_fullname.csv";  // facility to state data
+import statedata from "../data/newdata2/facility_to_state_sum_all.csv";  // facility to state data
 import facility_line_data from "../data/newdata/facility_to_state_year.csv"
-import stateselectdata from "../data/newdata1/state_to_state_sum_all_fullname.csv";  // state to state data
-import stackdata from "../data/newdata1/facility_to_state_year_sum2_fullname.csv";  // facility stackline chart data
-import facility_shut from "../data/newdata1/new_facility_shut_count.csv"
-import facility_scrub from "../data/newdata1/new_facility_scrubbed_count.csv"
-import facility_all from "../data/newdata1/new_facility_all_count.csv"
-import statestack from "../data/newdata1/pm25_facility_state_sum_fullname.csv"  // state stackline chart data
-import landingstate from "../data/newdata1/landing_state_overall.csv"
-import landingstack from "../data/newdata1/landing_state_overall_year.csv"
+import stateselectdata from "../data/newdata2/state_to_state_sum_all_fullname.csv";  // state to state data
+import stackdata from "../data/newdata2/facility_to_state_year_sum2_fullname.csv";  // facility stackline chart data
+import facility_shut from "../data/newdata2/new_facility_shut_count.csv"
+import facility_scrub from "../data/newdata2/new_facility_scrubbed_count.csv"
+import facility_all from "../data/newdata2/new_facility_all_count.csv"
+import statestack from "../data/newdata2/pm25_facility_state_sum_fullname.csv"  // state stackline chart data
+import landingstate from "../data/newdata2/landing_state_overall.csv"
+import landingstack from "../data/newdata2/landing_state_overall_year.csv"
 import { timeHours } from "d3";
 
 
@@ -1833,7 +1833,7 @@ class DotMapViewCombine extends React.Component {
         yAxis: [
           {
             type: 'value',
-            max: this.checkbox.current.checked ? 70000 : null
+            max: this.checkbox.current.checked ? 55000 : null
           }
         ],
         series: seriesdata
