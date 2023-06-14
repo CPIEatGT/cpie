@@ -89,6 +89,8 @@ class DotMapViewCombine extends React.Component {
   // When state dropdown menu are change, update the state associate view 
   handleChange = selectedOption => {
     $('#loading-image').show();
+    this.selectref0.inputRef.placeholder = 'New placeholder value' 
+    console.log(this.selectref0)
     this.FACID = null
     this.fname = null
     this.dotcheckbox.current.checked = false
@@ -1429,7 +1431,13 @@ class DotMapViewCombine extends React.Component {
   landingview() {
 
     $('#loading-image').show();
+    this.statecode = null
+    this.FACID = null
+    this.dotcheckbox.current.checked = true
 
+    const targetsvgElement = d3.select(this.targetsvg)
+    // targetsvgElement.append("g").attr("id", "tstatepath")
+    targetsvgElement.select("#tstatepath").selectAll("path").remove()
 
     d3.csv(landingstate).then((data) => {
       var self = this;
@@ -1531,7 +1539,8 @@ class DotMapViewCombine extends React.Component {
       // 'The overall statewide deaths'
 
       this.mtitle.innerText = ''
-
+      
+      svgElement.selectAll("circle").remove()
 
       d3.csv(statedata).then((circledata) => {
 
@@ -2078,7 +2087,7 @@ class DotMapViewCombine extends React.Component {
               <Select
                 
 
-                placeholder='Explore by state'
+                placeholder={this.statecode? this.statecode:'Explore by state' }
                 value={this.statecode}
                 onChange={this.handleChange}
                 options={this.selectoptions}
@@ -2099,6 +2108,10 @@ class DotMapViewCombine extends React.Component {
 
               </div>}
 
+             
+              <button style={{ zIndex:10000, position: 'absolute', top: '14vh', left: '20vw' }} onClick = {()=>this.landingview()}>
+              Reset Selections
+              </button>
             <div style={{ position: "relative", float: "left", left: "2vw", zIndex: 10000 }}>
               <span style={{ color: '#f1aca5', position: 'relative', top: '5px', right: '10px', fontSize: '15px' }}>show facilities</span>
               <label class="switch" >
