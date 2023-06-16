@@ -69,6 +69,8 @@ class DotMapViewCombine extends React.Component {
     this.checkbox = React.createRef();
     this.dotcheckbox = React.createRef();
     this.legendcheckbox = React.createRef();
+    this.selectref0 = React.createRef();
+    this.selectref = React.createRef();
     this.color = d3.scaleSequential(interpolateOrRd)
     this.dottooltip = d3.select("body")
       .append("div")
@@ -89,7 +91,7 @@ class DotMapViewCombine extends React.Component {
   // When state dropdown menu are change, update the state associate view 
   handleChange = selectedOption => {
     $('#loading-image').show();
-    this.selectref0.inputRef.placeholder = 'New placeholder value' 
+    this.selectref0.current.inputRef.placeholder = 'New placeholder value' 
     console.log(this.selectref0)
     this.FACID = null
     this.fname = null
@@ -99,12 +101,17 @@ class DotMapViewCombine extends React.Component {
     this.statecode = selectedOption.value
 
     // When state dropdown menu are change, update the state associate view 
-    this.stateSelect()
-    // update the stack line chart 
-    this.stackLine({ data: [] })
-    this.dottooltip.transition()
-      .duration(500)
-      .style("opacity", 0);
+    if(this.statecode === 'All States'){
+      this.landingview()
+    }else{
+      this.stateSelect()
+      // update the stack line chart 
+      this.stackLine({ data: [] })
+      this.dottooltip.transition()
+        .duration(500)
+        .style("opacity", 0);
+    }
+    
      
 
   };
@@ -114,7 +121,7 @@ class DotMapViewCombine extends React.Component {
 
   width = 860;
   height = 450;
-  selectoptions = [{ 'value': 'Alabama', 'label': 'Alabama' }, { 'value': 'Alaska', 'label': 'Alaska' }, { 'value': 'Arizona', 'label': 'Arizona' }, { 'value': 'Arkansas', 'label': 'Arkansas' }, { 'value': 'California', 'label': 'California' }, { 'value': 'Colorado', 'label': 'Colorado' }, { 'value': 'Connecticut', 'label': 'Connecticut' }, { 'value': 'Delaware', 'label': 'Delaware' }, { 'value': 'Florida', 'label': 'Florida' }, { 'value': 'Georgia', 'label': 'Georgia' }, { 'value': 'Hawaii', 'label': 'Hawaii' }, { 'value': 'Idaho', 'label': 'Idaho' }, { 'value': 'Illinois', 'label': 'Illinois' }, { 'value': 'Indiana', 'label': 'Indiana' }, { 'value': 'Iowa', 'label': 'Iowa' }, { 'value': 'Kansas', 'label': 'Kansas' }, { 'value': 'Kentucky', 'label': 'Kentucky' }, { 'value': 'Louisiana', 'label': 'Louisiana' }, { 'value': 'Maine', 'label': 'Maine' }, { 'value': 'Maryland', 'label': 'Maryland' }, { 'value': 'Massachusetts', 'label': 'Massachusetts' }, { 'value': 'Michigan', 'label': 'Michigan' }, { 'value': 'Minnesota', 'label': 'Minnesota' }, { 'value': 'Mississippi', 'label': 'Mississippi' }, { 'value': 'Missouri', 'label': 'Missouri' }, { 'value': 'Montana', 'label': 'Montana' }, { 'value': 'Nebraska', 'label': 'Nebraska' }, { 'value': 'Nevada', 'label': 'Nevada' }, {
+  selectoptions = [{ 'value': 'All States', 'label': 'All States' }, { 'value': 'Alabama', 'label': 'Alabama' }, { 'value': 'Alaska', 'label': 'Alaska' }, { 'value': 'Arizona', 'label': 'Arizona' }, { 'value': 'Arkansas', 'label': 'Arkansas' }, { 'value': 'California', 'label': 'California' }, { 'value': 'Colorado', 'label': 'Colorado' }, { 'value': 'Connecticut', 'label': 'Connecticut' }, { 'value': 'Delaware', 'label': 'Delaware' }, { 'value': 'Florida', 'label': 'Florida' }, { 'value': 'Georgia', 'label': 'Georgia' }, { 'value': 'Hawaii', 'label': 'Hawaii' }, { 'value': 'Idaho', 'label': 'Idaho' }, { 'value': 'Illinois', 'label': 'Illinois' }, { 'value': 'Indiana', 'label': 'Indiana' }, { 'value': 'Iowa', 'label': 'Iowa' }, { 'value': 'Kansas', 'label': 'Kansas' }, { 'value': 'Kentucky', 'label': 'Kentucky' }, { 'value': 'Louisiana', 'label': 'Louisiana' }, { 'value': 'Maine', 'label': 'Maine' }, { 'value': 'Maryland', 'label': 'Maryland' }, { 'value': 'Massachusetts', 'label': 'Massachusetts' }, { 'value': 'Michigan', 'label': 'Michigan' }, { 'value': 'Minnesota', 'label': 'Minnesota' }, { 'value': 'Mississippi', 'label': 'Mississippi' }, { 'value': 'Missouri', 'label': 'Missouri' }, { 'value': 'Montana', 'label': 'Montana' }, { 'value': 'Nebraska', 'label': 'Nebraska' }, { 'value': 'Nevada', 'label': 'Nevada' }, {
     'value':
       'New Hampshire', 'label': 'New Hampshire'
   }, { 'value': 'New Jersey', 'label': 'New Jersey' }, { 'value': 'New Mexico', 'label': 'New Mexico' }, { 'value': 'New York', 'label': 'New York' }, { 'value': 'North Carolina', 'label': 'North Carolina' }, { 'value': 'North Dakota', 'label': 'North Dakota' }, { 'value': 'Ohio', 'label': 'Ohio' }, {
@@ -2091,7 +2098,8 @@ class DotMapViewCombine extends React.Component {
                 value={this.statecode}
                 onChange={this.handleChange}
                 options={this.selectoptions}
-                ref={input => (this.selectref0 = input)}
+                // ref={input => (this.selectref0 = input)}
+                ref={this.selectref0}
               />
             </div>
 
@@ -2103,7 +2111,8 @@ class DotMapViewCombine extends React.Component {
                   value={this.FACID}
                   onChange={this.FACIDhandleChange}
                   options={facidjson}
-                  ref={input => (this.selectref = input)}
+                  // ref={input => (this.selectref = input)}
+                  ref={this.selectref}
                 />
 
               </div>}
