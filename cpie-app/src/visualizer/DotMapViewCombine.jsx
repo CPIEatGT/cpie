@@ -1643,9 +1643,9 @@ class DotMapViewCombine extends React.Component {
 
         
         var valuesToShow = [15000, 10000, 5000]
-        var xCircle = 780
-        var xLabel = 810
-        var yCircle = 350
+        var xCircle = 80
+        var xLabel = 110
+        var yCircle = 500
         svgElement
           .selectAll("clegend")
           .data(valuesToShow)
@@ -1691,7 +1691,7 @@ class DotMapViewCombine extends React.Component {
           .append("text")
           .attr("class", 'clegend_text')
           .attr('x', xLabel - 50)
-          .attr('y', yCircle - 70)
+          .attr('y', yCircle - 60)
           .text(function (d) { return d })
           .style("font-size", 10)
           .attr('alignment-baseline', 'middle')
@@ -2118,10 +2118,10 @@ class DotMapViewCombine extends React.Component {
               </div>}
 
              
-              <button style={{ zIndex:10000, position: 'absolute', top: '14vh', left: '20vw' }} onClick = {()=>this.landingview()}>
+              <button style={{ zIndex:10000, position: 'absolute', top: '14vh', left: '1vw' }} onClick = {()=>this.landingview()}>
               Reset Selections
               </button>
-            <div style={{ position: "relative", float: "left", left: "2vw", zIndex: 10000 }}>
+            <div style={{ position: "absolute", left: "2vw", top: '55vh',zIndex: 10000 }}>
               <span style={{ color: '#f1aca5', position: 'relative', top: '5px', right: '10px', fontSize: '15px' }}>show facilities</span>
               <label class="switch" >
                 <input type="checkbox" onChange={this.dottoggle} defaultChecked={true} ref={this.dotcheckbox} />
@@ -2213,14 +2213,14 @@ class DotMapViewCombine extends React.Component {
 
 
           <div key={this.FACID} style={{ width: 'auto', height: '90vh', display: 'block' }} ref={this.div}>
-            <div style={{ position: "relative", float: "left", left: "36vw" }}>
+            <div style={{ position: "absolute", left: "43vw", top: "60vh", zIndex:10000, transform: "rotate(-90deg)"}}>
               <span style={{ color: '#f1aca5', position: 'relative', top: '5px', right: '10px', fontSize: '15px' }}>consistent scale</span>
               <label class="switch" >
                 <input type="checkbox" onChange={this.toggle} defaultChecked={true} ref={this.checkbox} />
                 <span class="slider round"></span>
               </label>
             </div>
-            <div style={{ position: "relative", float: "left", left: "10vw" }}>
+            <div style={{ position: "relative", float: "left", left: "40vw" }}>
               <span style={{ color: '#f1aca5', position: 'relative', top: '5px', right: '15px', fontSize: '15px' }}>unselect all</span>
               <label class="switch" >
                 <input type="checkbox" onChange={this.legendtoggle} defaultChecked={false} ref={this.legendcheckbox} />
