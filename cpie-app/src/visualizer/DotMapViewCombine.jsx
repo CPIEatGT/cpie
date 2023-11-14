@@ -568,7 +568,7 @@ class DotMapViewCombine extends React.Component {
             right: '5%',
             top: '57%'
           },{
-          text:Math.ceil( totalDeath / 10) * 10 + ' deaths' + " (CI: " + Math.ceil( totalDeath1 / 10) * 10 + '-' + Math.ceil( totalDeath3 / 10) * 10 + ")"
+          text:parseFloat(totalDeath ).toFixed(2) + ' deaths' + " (CI: " + parseFloat( totalDeath1 ).toFixed(2) + '-' + parseFloat(totalDeath3 ).toFixed(2)  + ")"
 
           ,
 
@@ -893,7 +893,7 @@ class DotMapViewCombine extends React.Component {
 
           
           title: {
-            text:Math.ceil( totalDeath / 10) * 10 + ' deaths' +" (CI: " + Math.ceil( totalDeath1 / 10) * 10 + '-' + Math.ceil( totalDeath3 / 10) * 10 + ")",
+            text: parseFloat( totalDeath).toFixed(2)   + ' deaths' +" (CI: " + parseFloat( totalDeath1).toFixed(2) + '-' + parseFloat( totalDeath3).toFixed(2)  + ")",
   
   
             textStyle: {
@@ -913,7 +913,7 @@ class DotMapViewCombine extends React.Component {
               var series = this.myChart.getOption().series;
               var value = series.filter(row => row.name === name)[0].sum
               if (value > 10) {
-                return name + '    ' + Math.ceil(value / 10) * 10;
+                return name + '    ' + value ;
               } else {
                 return name + '    <10';
               }
@@ -1589,7 +1589,7 @@ class DotMapViewCombine extends React.Component {
             this.dottooltip.transition()
               .duration(200)
               .style("opacity", .9);
-          this.dottooltip.text("Total deaths from " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 + " (CI: " +Math.ceil(d.deaths_coef_1_all / 10) * 10 +"-"+ Math.ceil(d.deaths_coef_3_all / 10) * 10 +")" )
+              this.dottooltip.text("Total deaths from " + this.fnameDict[parseInt(d["FacID"])][0]  + ": " + Math.ceil(d.deaths_coef_2_all / 10) * 10 + " (CI: " +Math.ceil(d.deaths_coef_1_all / 10) * 10 +"-"+ Math.ceil(d.deaths_coef_3_all / 10) * 10 +")" )
               .style("left", (event.pageX) + "px")
               .style("top", (event.pageY - 28) + "px");
             
@@ -1802,7 +1802,7 @@ class DotMapViewCombine extends React.Component {
 
        
         title: {
-          text: Math.ceil( totalDeath / 10) * 10 + ' deaths' +" (CI: " + Math.ceil( totalDeath1 / 10) * 10 + '-' + Math.ceil( totalDeath3 / 10) * 10 + ")",
+          text:  parseFloat( totalDeath).toFixed(2)  + ' deaths' +" (CI: " + parseFloat( totalDeath1 ).toFixed(2)  + '-' + parseFloat( totalDeath3 ).toFixed(2) + ")",
 
 
           textStyle: {
@@ -2172,9 +2172,9 @@ class DotMapViewCombine extends React.Component {
               <p >Data and methods</p>
               <p className="insidep"> Facility information is taken from <a target="_blank" className="insidea" href="https://campd.epa.gov/">EPA’s Clean Air Markets Program Data </a> (https://campd.epa.gov/) .</p>
               <p className="insidep"> Population exposure is derived from each facility’s sulfur dioxide (SO<sub>2</sub>) emissions, atmospheric transport and dispersion, and chemical conversion to fine particulate matter (PM<sub>2.5</sub>). Other exposures and impacts (e.g., climate impacts) are not considered.</p>
-              <p className="insidep"> Deaths correspond to excess mortalities in the US Medicare population. Values in parentheses represent 95% confidence intervals.</p>
-              <p className="insidep"> More detail on the methods is available here:</p>
-              <p className="insidep"> Lucas Henneman, Christine Choirat, Irene Dedoussi, Francesca Dominici, Jessica Roberts, Corwin Zigler. Coal’s toll: 22 years of Medicare deaths attributable to electricity generation. <i>Under review</i>.</p>
+              <p className="insidep"> Deaths correspond to excess mortalities in the US Medicare population. Values in parentheses represent 95% confidence intervals. Reported deaths are rounded.</p>
+              <p className="insidep"> The full publication is available here:</p>
+              <p className="insidep"> Lucas Henneman, Christine Choirat, Irene Dedoussi, Francesca Dominici, Jessica Roberts, Corwin Zigler.  "22 Years of Coal Pollution and Premature Deaths in the Medicare Population." AGU Fall Meeting Abstracts. Vol. 2022. </p>
               
               <p>Development</p>
               <a target="_blank" href="https://sichenj.in/">Sichen Jin, Georgia Institute of Technology</a>
