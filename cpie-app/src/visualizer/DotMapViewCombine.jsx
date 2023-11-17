@@ -593,7 +593,7 @@ class DotMapViewCombine extends React.Component {
               var series = this.myChart.getOption().series;
               var value = series.filter(row => row.name === name)[0].sum
               if (value > 10) {
-                return name + '    ' + Math.ceil(value / 10) * 10;
+                return name + '    ' + Number( value.toPrecision(2) );
               } else {
                 return name + '    <10';
               }
@@ -731,8 +731,8 @@ class DotMapViewCombine extends React.Component {
             this.dottooltip.transition()
               .duration(200)
               .style("opacity", .9);
-            this.dottooltip.text('Associated with ' + Math.ceil(sumvalue / 10) * 10 +   ' deaths in ' + statename +
-            " (CI: " + Math.ceil(sumvalue1 / 10) * 10 + "-" + Math.ceil(sumvalue3 / 10) * 10 + ")"
+            this.dottooltip.text('Associated with ' + Number( sumvalue.toPrecision(2) ) +   ' deaths in ' + statename +
+            " (CI: " + Number( sumvalue1.toPrecision(2) ) + "-" + Number( sumvalue3.toPrecision(2) ) + ")"
 
             )
               .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw')
@@ -913,7 +913,7 @@ class DotMapViewCombine extends React.Component {
               var series = this.myChart.getOption().series;
               var value = series.filter(row => row.name === name)[0].sum
               if (value > 10) {
-                return name + '    ' + Math.ceil(value / 10) * 10 ;
+                return name + '    ' + Number(value.toPrecision(2)) ;
               } else {
                 return name + '    <10';
               }
@@ -1822,7 +1822,7 @@ class DotMapViewCombine extends React.Component {
             var series = this.myChart.getOption().series;
             var value = series.filter(row => row.name === name)[0].sum
             if (value > 10) {
-              return name + '    ' + Math.ceil(value / 10) * 10;
+              return name + '    ' + Number(value.toPrecision(2));
             } else {
               return name + '    <10';
             }
@@ -1915,8 +1915,8 @@ class DotMapViewCombine extends React.Component {
           this.dottooltip.transition()
             .duration(200)
             .style("opacity", .9);
-          this.dottooltip.text('Associated with ' + Math.ceil(sumvalue / 10) * 10 +   ' deaths in ' + statename +
-          " (CI: " + Math.ceil(sumvalue1 / 10) * 10 + "-" + Math.ceil(sumvalue3 / 10) * 10 + ")"
+          this.dottooltip.text('Associated with ' +  Number( sumvalue.toPrecision(2) )  +   ' deaths in ' + statename +
+          " (CI: " + Number( sumvalue1.toPrecision(2) ) + "-" + Number( sumvalue3.toPrecision(2) ) + ")"
             )
             .style("left", (params.offsetX * (100 / document.documentElement.clientWidth) + 50) + 'vw')
             .style("top", (params.offsetY+50) + "px");
@@ -2174,7 +2174,7 @@ class DotMapViewCombine extends React.Component {
               <p className="insidep"> Population exposure is derived from each facility’s sulfur dioxide (SO<sub>2</sub>) emissions, atmospheric transport and dispersion, and chemical conversion to fine particulate matter (PM<sub>2.5</sub>). Other exposures and impacts (e.g., climate impacts) are not considered.</p>
               <p className="insidep"> Deaths correspond to excess mortalities in the US Medicare population. Values in parentheses represent 95% confidence intervals. Reported deaths are rounded.</p>
               <p className="insidep"> The full publication is available here:</p>
-              <p className="insidep"> Lucas Henneman, Christine Choirat, Irene Dedoussi, Francesca Dominici, Jessica Roberts, Corwin Zigler. (2023). “Mortality risk from United States coal electricity generation.” Science. https://www.science.org/doi/10.1126/science.adf4915</p>
+              <p className="insidep"> Lucas Henneman, Christine Choirat, Irene Dedoussi, Francesca Dominici, Jessica Roberts, Corwin Zigler. (2023). “Mortality risk from United States coal electricity generation.” Science. <a style = {{padding:'0px', margin: '0px', display:'inline'}} href= "https://www.science.org/doi/10.1126/science.adf4915">https://www.science.org/doi/10.1126/science.adf4915</a> </p>
               
               <p>Development</p>
               <a target="_blank" href="https://sichenj.in/">Sichen Jin, Georgia Institute of Technology</a>
