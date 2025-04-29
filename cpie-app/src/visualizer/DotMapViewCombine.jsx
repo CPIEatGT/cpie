@@ -2169,7 +2169,7 @@ class DotMapViewCombine extends React.Component {
               <a target="_blank" href="https://tiles.cc.gatech.edu">Jessica Roberts, Georgia Institute of Technology</a>
               <a target="_blank" href="https://cns.utexas.edu/directory/item/3761-zigler-corwin?Itemid=349">Corwin Ziger, University of Texas, Austin</a>
 
-              <p >Data and methods</p>
+              <p >Data and Methods</p>
               <p className="insidep"> Facility information is taken from <a target="_blank" className="insidea" href="https://campd.epa.gov/">EPA’s Clean Air Markets Program Data </a> (https://campd.epa.gov/) .</p>
               <p className="insidep"> Population exposure is derived from each facility’s sulfur dioxide (SO<sub>2</sub>) emissions, atmospheric transport and dispersion, and chemical conversion to fine particulate matter (PM<sub>2.5</sub>). Other exposures and impacts (e.g., climate impacts) are not considered.</p>
               <p className="insidep"> Deaths correspond to excess mortalities in the US Medicare population. Values in parentheses represent 95% confidence intervals. Reported deaths are rounded.</p>
